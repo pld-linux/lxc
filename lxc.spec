@@ -7,6 +7,9 @@ Group:		Base
 Source0:	http://dl.sourceforge.net/lxc/%{name}-%{version}.tar.gz
 # Source0-md5:	327f0e700858ab5b916aa36517680256
 URL:		http://sourceforge.net/projects/lxc
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -37,8 +40,13 @@ Static lxc library.
 
 %prep
 %setup -q
+sed -i -e 's#^lxcpath=.*#lxcpath=/var/lxc#g' src/lxc/Makefile.am
 
 %build
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__automake}
 %configure
 
 %{__make}
@@ -48,6 +56,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+install -d $RPM_BUILD_ROOT/var/lxc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -61,6 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/liblxc-*.so
 %dir %{_sysconfdir}/lxc
+%dir /var/lxc
 
 %files devel
 %defattr(644,root,root,755)
