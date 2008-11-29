@@ -1,3 +1,4 @@
+# TODO: FHS (/var/lxc -> /var/lib/lxc)
 Summary:	Linux Container Tools
 Name:		lxc
 Version:	0.4.0
