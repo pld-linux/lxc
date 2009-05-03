@@ -1,12 +1,13 @@
 # TODO: FHS (/var/lxc -> /var/lib/lxc)
 Summary:	Linux Container Tools
 Name:		lxc
-Version:	0.4.0
+Version:	0.6.2
 Release:	1
 License:	GPL
 Group:		Base
 Source0:	http://dl.sourceforge.net/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	327f0e700858ab5b916aa36517680256
+# Source0-md5:	eb4e14c2d58663f5ebcd6cd3d6a61fe6
+Patch0:		%{name}-ldflags.patch
 URL:		http://sourceforge.net/projects/lxc
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -41,11 +42,12 @@ Static lxc library.
 
 %prep
 %setup -q
+%patch0 -p1
 sed -i -e 's#^lxcpath=.*#lxcpath=/var/lxc#g' src/lxc/Makefile.am
 
 %build
 %{__libtoolize}
-%{__aclocal}
+%{__aclocal} -I config
 %{__autoconf}
 %{__automake}
 %configure
@@ -69,10 +71,14 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README etc/*.conf etc/*-config
+%dir %{_sysconfdir}/lxc
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/*
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/liblxc-*.so
+%{_mandir}/*/**
 %dir %{_sysconfdir}/lxc
 %dir /var/lxc
+%attr(755,root,root) %{_libdir}/lxc-init
 
 %files devel
 %defattr(644,root,root,755)
