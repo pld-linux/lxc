@@ -1,18 +1,20 @@
-# TODO: FHS (/var/lxc -> /var/lib/lxc)
 Summary:	Linux Container Tools
 Name:		lxc
-Version:	0.6.2
+Version:	0.6.5
 Release:	1
 License:	GPL
 Group:		Base
 Source0:	http://dl.sourceforge.net/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	eb4e14c2d58663f5ebcd6cd3d6a61fe6
-Patch0:		%{name}-ldflags.patch
+# Source0-md5:	d648bcf82541c0da6725da502ee1d111
 URL:		http://sourceforge.net/projects/lxc
 BuildRequires:	autoconf
 BuildRequires:	automake
+BuildRequires:	docbook-dtd30-sgml
+BuildRequires:	docbook-utils
 BuildRequires:	libtool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		configpath	/var/lib/lxc
 
 %description
 Tools to create and manage containers. It contains a full featured
@@ -32,35 +34,31 @@ Requires:	%{name} = %{epoch}:%{version}-%{release}
 %description devel
 lxc development files.
 
-%package static
-Summary:	Static lxc library
-Group:		Development/Libraries
-Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
-
-%description static
-Static lxc library.
-
 %prep
 %setup -q
-%patch0 -p1
-sed -i -e 's#^lxcpath=.*#lxcpath=/var/lxc#g' src/lxc/Makefile.am
 
 %build
 %{__libtoolize}
 %{__aclocal} -I config
 %{__autoconf}
 %{__automake}
-%configure
+%configure \
+	--with-config-path=%{configpath}
 
 %{__make}
+%{__make} -C doc
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT \
+	pcdatadir=%{_pkgconfigdir}
+%{__make} -C doc install \
 	DESTDIR=$RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
 
-install -d $RPM_BUILD_ROOT/var/lxc
+install -d $RPM_BUILD_ROOT%{configpath}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -70,22 +68,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog README etc/*.conf etc/*-config
-%dir %{_sysconfdir}/lxc
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/*
+%doc AUTHORS ChangeLog README doc/examples/*.conf
 %attr(755,root,root) %{_bindir}/*
-%attr(755,root,root) %{_libdir}/liblxc-*.so
-%{_mandir}/*/**
-%dir %{_sysconfdir}/lxc
-%dir /var/lxc
+%attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/liblxc.so.0
+%{_mandir}/man?/lxc*
+%dir %{configpath}
 %attr(755,root,root) %{_libdir}/lxc-init
 
 %files devel
 %defattr(644,root,root,755)
 %{_includedir}/lxc
 %attr(755,root,root) %{_libdir}/liblxc.so
-%{_libdir}/lib*.la
-
-%files static
-%defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_pkgconfigdir}/lxc.pc
