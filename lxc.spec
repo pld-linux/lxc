@@ -6,7 +6,7 @@ License:	GPL
 Group:		Base
 Source0:	http://dl.sourceforge.net/lxc/%{name}-%{version}.tar.gz
 # Source0-md5:	d648bcf82541c0da6725da502ee1d111
-URL:		http://sourceforge.net/projects/lxc
+URL:		http://lxc.sourceforge.net
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	docbook-dtd30-sgml
@@ -68,7 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog README doc/examples/*.conf
+%doc AUTHORS ChangeLog CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.0
