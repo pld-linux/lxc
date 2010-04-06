@@ -11,6 +11,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	docbook-dtd30-sgml
 BuildRequires:	docbook-utils
+BuildRequires:	libcap-devel
 BuildRequires:	libtool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
