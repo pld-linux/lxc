@@ -1,11 +1,11 @@
 Summary:	Linux Container Tools
 Name:		lxc
-Version:	0.6.5
+Version:	0.7.1
 Release:	1
 License:	GPL
 Group:		Base
 Source0:	http://dl.sourceforge.net/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	d648bcf82541c0da6725da502ee1d111
+# Source0-md5:	7a48d7bf11c1ac26cba67fd43eac3e46
 URL:		http://lxc.sourceforge.net
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -69,13 +69,18 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
+%doc AUTHORS ChangeLog CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf 
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.0
+%{_libdir}/lxc/rootfs/README
 %{_mandir}/man?/lxc*
 %dir %{configpath}
-%attr(755,root,root) %{_libdir}/lxc-init
+%dir %{_libdir}/lxc
+%dir %{_libdir}/lxc/templates
+%dir %{_libdir}/lxc/rootfs
+%attr(755,root,root) %{_libdir}/lxc/lxc-init
+%attr(755,root,root) %{_libdir}/lxc/templates/lxc-*
 
 %files devel
 %defattr(644,root,root,755)
