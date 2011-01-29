@@ -1,11 +1,11 @@
 Summary:	Linux Container Tools
 Name:		lxc
-Version:	0.7.2
+Version:	0.7.3
 Release:	1
 License:	GPL
 Group:		Base
-Source0:	http://dl.sourceforge.net/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	5c9c6889ba1255217078ea5d1aaf0c82
+Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
+# Source0-md5:	c12fb813362b37d783ca2c9551ccd716
 URL:		http://lxc.sourceforge.net
 BuildRequires:	autoconf
 BuildRequires:	automake
