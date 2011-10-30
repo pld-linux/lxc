@@ -1,14 +1,13 @@
 Summary:	Linux Container Tools
 Name:		lxc
 Version:	0.7.5
-Release:	1
+Release:	2
 License:	GPL
 Group:		Base
 Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
 # Source0-md5:	04949900ff56898f4353b130929c09d1
+Patch0:		%{name}-devpts.patch
 URL:		http://lxc.sourceforge.net
-BuildRequires:	autoconf
-BuildRequires:	automake
 BuildRequires:	docbook-dtd30-sgml
 BuildRequires:	docbook-utils
 BuildRequires:	libcap-devel
@@ -37,12 +36,9 @@ lxc development files.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-%{__libtoolize}
-%{__aclocal} -I config
-%{__autoconf}
-%{__automake}
 %configure \
 	--with-config-path=%{configpath}
 
@@ -55,9 +51,11 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	pcdatadir=%{_pkgconfigdir}
+
 %{__make} -C doc install \
 	DESTDIR=$RPM_BUILD_ROOT
-rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
+
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/doc
 
 install -d $RPM_BUILD_ROOT%{configpath}
 

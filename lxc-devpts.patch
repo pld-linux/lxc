@@ -1,0 +1,11 @@
+--- lxc-0.7.5/src/lxc/conf.c.orig	2011-07-25 00:27:10.000000000 +0200
++++ lxc-0.7.5/src/lxc/conf.c	2011-10-30 18:30:27.718356070 +0100
+@@ -763,7 +763,7 @@
+ 	}
+ 
+ 	if (mount("devpts", "/dev/pts", "devpts", MS_MGC_VAL,
+-		  "newinstance,ptmxmode=0666")) {
++		  "newinstance,ptmxmode=0666,mode=620,gid=5")) {
+ 		SYSERROR("failed to mount a new instance of '/dev/pts'");
+ 		return -1;
+ 	}
