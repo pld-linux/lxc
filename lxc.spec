@@ -1,11 +1,11 @@
 Summary:	Linux Container Tools
 Name:		lxc
-Version:	0.7.5
-Release:	2
+Version:	0.9.0
+Release:	0
 License:	GPL
 Group:		Base
-Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	04949900ff56898f4353b130929c09d1
+Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.rc1.tar.gz
+# Source0-md5:	e7c5f98b6c2450593d9d74dc7625c9f0
 Patch0:		%{name}-devpts.patch
 URL:		http://lxc.sourceforge.net
 BuildRequires:	docbook-dtd30-sgml
@@ -35,7 +35,7 @@ Requires:	%{name} = %{epoch}:%{version}-%{release}
 lxc development files.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}.rc1
 %patch0 -p1
 
 %build
@@ -67,18 +67,18 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf 
+%doc AUTHORS ChangeLog CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.0
 %{_libdir}/lxc/rootfs/README
-%{_mandir}/man?/lxc*
 %dir %{configpath}
 %dir %{_libdir}/lxc
-%dir %{_libdir}/lxc/templates
 %dir %{_libdir}/lxc/rootfs
 %attr(755,root,root) %{_libdir}/lxc/lxc-init
-%attr(755,root,root) %{_libdir}/lxc/templates/lxc-*
+%dir %{_sysconfdir}/lxc
+%config(noreplace) %{_sysconfdir}/lxc/default.conf
+%{_datadir}/lxc
 
 %files devel
 %defattr(644,root,root,755)
