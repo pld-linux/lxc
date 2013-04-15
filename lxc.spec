@@ -1,11 +1,11 @@
 Summary:	Linux Container Tools
 Name:		lxc
 Version:	0.9.0
-Release:	0
+Release:	1
 License:	GPL
 Group:		Base
-Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.rc1.tar.gz
-# Source0-md5:	e7c5f98b6c2450593d9d74dc7625c9f0
+Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
+# Source0-md5:	8552a4479090616f4bc04d8473765fc9
 Patch0:		%{name}-devpts.patch
 URL:		http://lxc.sourceforge.net
 BuildRequires:	docbook-dtd30-sgml
@@ -35,7 +35,7 @@ Requires:	%{name} = %{epoch}:%{version}-%{release}
 lxc development files.
 
 %prep
-%setup -q -n %{name}-%{version}.rc1
+%setup -q -n %{name}-%{version}
 %patch0 -p1
 
 %build
