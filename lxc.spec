@@ -1,4 +1,3 @@
-# TODO: move lua/python-dependent utils to lya-/python-
 #
 # Conditional build:
 %bcond_without	seccomp	# SecComp syscall filter
@@ -10,7 +9,7 @@ Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	0.9.0
 Release:	1
-License:	GPL
+License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
 # Source0-md5:	8552a4479090616f4bc04d8473765fc9
@@ -29,6 +28,7 @@ BuildRequires:	libcap-devel
 BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python3-devel >= 3.2}
 BuildRequires:	rpmbuild(macros) >= 1.612
+BuildRequires:	sed >= 4.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		configpath	/var/lib/lxc
@@ -132,6 +132,9 @@ install -d $RPM_BUILD_ROOT%{configpath}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
 %py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
 %endif
+%if %{with lua}
+%{__sed} -i -e '1s,#!/usr/bin/env lua,#!/usr/bin/lua51,' $RPM_BUILD_ROOT%{_bindir}/lxc-top
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -142,7 +145,29 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
-%attr(755,root,root) %{_bindir}/lxc-*
+%attr(755,root,root) %{_bindir}/lxc-attach
+%attr(755,root,root) %{_bindir}/lxc-cgroup
+%attr(755,root,root) %{_bindir}/lxc-checkconfig
+%attr(755,root,root) %{_bindir}/lxc-checkpoint
+%attr(755,root,root) %{_bindir}/lxc-clone
+%attr(755,root,root) %{_bindir}/lxc-console
+%attr(755,root,root) %{_bindir}/lxc-create
+%attr(755,root,root) %{_bindir}/lxc-destroy
+%attr(755,root,root) %{_bindir}/lxc-execute
+%attr(755,root,root) %{_bindir}/lxc-freeze
+%attr(755,root,root) %{_bindir}/lxc-info
+%attr(755,root,root) %{_bindir}/lxc-kill
+%attr(755,root,root) %{_bindir}/lxc-monitor
+%attr(755,root,root) %{_bindir}/lxc-netstat
+%attr(755,root,root) %{_bindir}/lxc-ps
+%attr(755,root,root) %{_bindir}/lxc-restart
+%attr(755,root,root) %{_bindir}/lxc-shutdown
+%attr(755,root,root) %{_bindir}/lxc-start
+%attr(755,root,root) %{_bindir}/lxc-stop
+%attr(755,root,root) %{_bindir}/lxc-unfreeze
+%attr(755,root,root) %{_bindir}/lxc-unshare
+%attr(755,root,root) %{_bindir}/lxc-version
+%attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.0
 %dir %{configpath}
@@ -153,9 +178,36 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %{_datadir}/lxc
-%{_mandir}/man1/lxc-*.1*
+%{_mandir}/man1/lxc-attach.1*
+%{_mandir}/man1/lxc-cgroup.1*
+%{_mandir}/man1/lxc-checkconfig.1*
+%{_mandir}/man1/lxc-checkpoint.1*
+%{_mandir}/man1/lxc-clone.1*
+%{_mandir}/man1/lxc-console.1*
+%{_mandir}/man1/lxc-create.1*
+%{_mandir}/man1/lxc-destroy.1*
+%{_mandir}/man1/lxc-execute.1*
+%{_mandir}/man1/lxc-freeze.1*
+%{_mandir}/man1/lxc-info.1*
+%{_mandir}/man1/lxc-kill.1*
+%{_mandir}/man1/lxc-monitor.1*
+%{_mandir}/man1/lxc-netstat.1*
+%{_mandir}/man1/lxc-ps.1*
+%{_mandir}/man1/lxc-restart.1*
+%{_mandir}/man1/lxc-shutdown.1*
+%{_mandir}/man1/lxc-start.1*
+%{_mandir}/man1/lxc-stop.1*
+%{_mandir}/man1/lxc-unfreeze.1*
+%{_mandir}/man1/lxc-unshare.1*
+%{_mandir}/man1/lxc-version.1*
+%{_mandir}/man1/lxc-wait.1*
 %{_mandir}/man5/lxc.conf.5*
 %{_mandir}/man7/lxc.7*
+%if %{without python}
+# legacy version
+%attr(755,root,root) %{_bindir}/lxc-ls
+%{_mandir}/man1/lxc-ls.1*
+%endif
 
 %files devel
 %defattr(644,root,root,755)
@@ -166,15 +218,23 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with lua}
 %files -n lua-lxc
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/lxc-top
 %dir %{_libdir}/lua/5.1/lxc
 %attr(755,root,root) %{_libdir}/lua/5.1/lxc/core.so
 %{_datadir}/lua/5.1/lxc.lua
+%{_mandir}/man1/lxc-top.1*
 %endif
 
 %if %{with python}
 %files -n python3-lxc
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/lxc-device
+%attr(755,root,root) %{_bindir}/lxc-ls
+%attr(755,root,root) %{_bindir}/lxc-start-ephemeral
 %{py3_sitedir}/lxc
 %attr(755,root,root) %{py3_sitedir}/_lxc.cpython-*.so
 %{py3_sitedir}/_lxc-0.1-py*.egg-info
+%{_mandir}/man1/lxc-device.1*
+%{_mandir}/man1/lxc-ls.1*
+%{_mandir}/man1/lxc-start-ephemeral.1*
 %endif
