@@ -3,12 +3,12 @@
 %bcond_without	seccomp	# SecComp syscall filter
 %bcond_without	lua	# Lua binding
 %bcond_without	python	# Python binding
-#
+
 Summary:	Linux Container Tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	0.9.0
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
@@ -18,9 +18,9 @@ Patch1:		%{name}-pld.patch
 URL:		http://lxc.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
-BuildRequires:	docbook2X
 BuildRequires:	docbook-dtd30-sgml
 BuildRequires:	docbook-utils
+BuildRequires:	docbook2X
 BuildRequires:	libapparmor-devel
 BuildRequires:	libcap-devel
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
@@ -29,6 +29,7 @@ BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python3-devel >= 3.2}
 BuildRequires:	rpmbuild(macros) >= 1.612
 BuildRequires:	sed >= 4.0
+Suggests:	net-tools
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		configpath	/var/lib/lxc
@@ -124,7 +125,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} -C doc install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/doc
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}
 
 install -d $RPM_BUILD_ROOT%{configpath}
 
