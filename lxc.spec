@@ -8,7 +8,7 @@ Summary:	Linux Container Tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	0.9.0
-Release:	3
+Release:	4
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
@@ -17,6 +17,7 @@ Patch0:		%{name}-devpts.patch
 Patch1:		%{name}-pld.patch
 Patch2:		am-1.14.patch
 Patch3:		checkconfig-module.patch
+Patch4:		checkconfig-vserver-config.patch
 URL:		http://lxc.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -100,6 +101,7 @@ Wiązanie Pythona (3.x) do LXC.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 %{__aclocal} -I config
