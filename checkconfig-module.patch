@@ -1,3 +1,6 @@
+Upstream:
+http://sourceforge.net/p/lxc/bugs/74/
+
 --- lxc-0.9.0/src/lxc/lxc-checkconfig.in~	2013-02-18 09:47:43.000000000 +0200
 +++ lxc-0.9.0/src/lxc/lxc-checkconfig.in	2013-09-17 11:58:24.442289798 +0300
 @@ -3,6 +3,7 @@
