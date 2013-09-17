@@ -1,3 +1,5 @@
+Upstream tracker: https://sourceforge.net/p/lxc/bugs/75/
+
 the variables get assigned as:
 KVER_MAJOR="3\n# Linux VServer"
 KVER_MINOR="10\n# Linux VServer"
