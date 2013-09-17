@@ -16,6 +16,7 @@ Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
 Patch0:		%{name}-devpts.patch
 Patch1:		%{name}-pld.patch
 Patch2:		am-1.14.patch
+Patch3:		checkconfig-module.patch
 URL:		http://lxc.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -98,6 +99,7 @@ Wiązanie Pythona (3.x) do LXC.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %{__aclocal} -I config
