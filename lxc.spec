@@ -18,6 +18,7 @@ Patch1:		%{name}-pld.patch
 Patch2:		am-1.14.patch
 Patch3:		checkconfig-module.patch
 Patch4:		checkconfig-vserver-config.patch
+Patch5:		fedora-template.patch
 URL:		http://lxc.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -102,6 +103,7 @@ Wiązanie Pythona (3.x) do LXC.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %build
 %{__aclocal} -I config
@@ -124,7 +126,6 @@ Wiązanie Pythona (3.x) do LXC.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{configpath},/var/cache/lxc}
-
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	pcdatadir=%{_pkgconfigdir}
