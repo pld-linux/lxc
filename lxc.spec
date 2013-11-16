@@ -33,6 +33,7 @@ BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python3-devel >= 3.2}
 BuildRequires:	rpmbuild(macros) >= 1.612
 BuildRequires:	sed >= 4.0
+Requires:	rc-scripts >= 0.4.6
 Suggests:	net-tools
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
