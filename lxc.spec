@@ -123,6 +123,7 @@ Wiązanie Pythona (3.x) do LXC.
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT{%{configpath},/var/cache/lxc}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
@@ -132,8 +133,6 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}
-
-install -d $RPM_BUILD_ROOT%{configpath}
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
@@ -177,7 +176,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.0
-%dir %{configpath}
 %dir %{_libdir}/lxc
 %dir %{_libdir}/lxc/rootfs
 %{_libdir}/lxc/rootfs/README
@@ -220,6 +218,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-ls
 %{_mandir}/man1/lxc-ls.1*
 %endif
+
+%dir %{configpath}
+%dir /var/cache/lxc
 
 %files devel
 %defattr(644,root,root,755)
