@@ -8,7 +8,7 @@ Summary:	Linux Container Tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	0.9.0
-Release:	4
+Release:	5
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
@@ -184,7 +184,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/lxc/lxc-init
 %dir %{_sysconfdir}/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
-%{_datadir}/lxc
+%dir %{_datadir}/lxc
+%{_datadir}/%{name}/lxc.functions
+%dir %{_datadir}/%{name}/hooks
+%dir %{_datadir}/%{name}/templates
+%attr(755,root,root) %{_datadir}/%{name}/hooks/mount*
+%attr(755,root,root) %{_datadir}/%{name}/templates/lxc-*
 %{_mandir}/man1/lxc-attach.1*
 %{_mandir}/man1/lxc-cgroup.1*
 %{_mandir}/man1/lxc-checkconfig.1*
