@@ -30,13 +30,6 @@ cache_base=@LOCALSTATEDIR@/cache/lxc/pld/$arch
 default_path=@LXCPATH@
 root_password=root
 
-# is this pld?
-# Alow for weird remixes like the Raspberry Pi
-#
-# Use the Mitre standard CPE identifier for the release ID if possible...
-# This may be in /etc/os-release or /etc/system-release-cpe.  We
-# should be able to use EITHER.  Give preference to /etc/os-release for now.
-
 if [ -e /etc/os-release ]; then
 	# This is a shell friendly configuration file.  We can just source it.
 	# What we're looking for in here is the ID, VERSION_ID and the CPE_NAME
@@ -76,6 +69,7 @@ configure_pld()
     fi
 
     # set minimal hosts
+	test -e $rootfs_path/etc/hosts || \
     cat <<EOF > $rootfs_path/etc/hosts
 127.0.0.1 localhost.localdomain localhost $utsname
 ::1                 localhost6.localdomain6 localhost6
@@ -158,7 +152,6 @@ download_pld()
 
     mkdir -p $INSTALL_ROOT@LOCALSTATEDIR@/lib/rpm
     rpm --root $INSTALL_ROOT --initdb
-    rpm --root $INSTALL_ROOT -ivh ${INSTALL_ROOT}/${RELEASE_RPM}
     $POLDEK -u $PKG_LIST
 
     if [ $? -ne 0 ]; then
