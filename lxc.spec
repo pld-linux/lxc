@@ -1,6 +1,7 @@
 #
 # Conditional build:
 %bcond_without	seccomp	# SecComp syscall filter
+%bcond_without	apparmor	# apparmor
 %bcond_without	lua	# Lua binding
 %bcond_without	python	# Python binding
 
@@ -25,7 +26,7 @@ BuildRequires:	automake
 BuildRequires:	docbook-dtd30-sgml
 BuildRequires:	docbook-utils
 BuildRequires:	docbook2X
-BuildRequires:	libapparmor-devel
+%{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
 %{?with_lua:BuildRequires:	lua51-devel >= 5.1}
@@ -115,9 +116,10 @@ Wiązanie Pythona (3.x) do LXC.
 	db2xman=docbook2X2man \
 	--disable-rpath \
 	--enable-doc \
-	%{?with_lua:--enable-lua} \
-	%{?with_python:--enable-python} \
-	%{?with_seccomp:--enable-seccomp} \
+	%{__enable_disable apparmor} \
+	%{__enable_disable lua} \
+	%{__enable_disable python} \
+	%{__enable_disable seccomp} \
 	--with-config-path=%{configpath} \
 	--with-distro=pld
 
