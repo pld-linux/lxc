@@ -14,6 +14,7 @@ License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
 # Source0-md5:	8552a4479090616f4bc04d8473765fc9
+Source1:	lxc-pld.in.sh
 Patch0:		%{name}-devpts.patch
 Patch1:		%{name}-pld.patch
 Patch2:		am-1.14.patch
@@ -106,6 +107,8 @@ Wiązanie Pythona (3.x) do LXC.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+
+cp -p %{SOURCE1} templates/lxc-pld.in
 
 %build
 %{__aclocal} -I config

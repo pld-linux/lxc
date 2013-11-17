@@ -18,3 +18,13 @@
  else
      LUAPKGCONFIG=lua
  fi
+--- lxc-0.9.0/templates/Makefile.am~	2013-03-19 00:17:01.000000000 +0200
++++ lxc-0.9.0/templates/Makefile.am	2013-11-17 03:44:48.326889371 +0200
+@@ -6,6 +6,7 @@
+ 	lxc-ubuntu-cloud \
+ 	lxc-opensuse \
+ 	lxc-fedora \
++	lxc-pld \
+ 	lxc-oracle \
+ 	lxc-altlinux \
+ 	lxc-busybox \
