@@ -106,6 +106,9 @@ configure_pld_init()
 	# Setup getty service on the 4 ttys we are going to allow in the
 	# default config. Number should match lxc.tty
 #	sed -i -e 's///' ${rootfs_path}/etc/inittab
+
+	# nothing done here yet
+	:
 }
 
 configure_pld_systemd()
