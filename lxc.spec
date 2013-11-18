@@ -14,7 +14,7 @@ License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
 # Source0-md5:	8552a4479090616f4bc04d8473765fc9
-Source1:	lxc-pld.in.sh
+Source1:	%{name}-pld.in.sh
 Patch0:		%{name}-devpts.patch
 Patch1:		%{name}-pld.patch
 Patch2:		am-1.14.patch
@@ -36,6 +36,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.612
 BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
+Requires:	which
 Suggests:	net-tools
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
