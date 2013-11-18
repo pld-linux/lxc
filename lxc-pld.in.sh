@@ -61,7 +61,7 @@ configure_pld()
 	echo 0 > $rootfs_path/selinux/enforce
 
 	# configure the network using the dhcp
-	sed -i -e "/^HOSTNAME=.*/HOSTNAME=${utsname}/" ${rootfs_path}/etc/sysconfig/network
+	sed -i -e "s/^HOSTNAME=.*/HOSTNAME=${utsname}/" ${rootfs_path}/etc/sysconfig/network
 
 	# set hostname on systemd
 	if [ $release = "3.0" ]; then
