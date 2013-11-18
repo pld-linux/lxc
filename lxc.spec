@@ -131,7 +131,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{configpath},/var/cache/lxc}
+install -d $RPM_BUILD_ROOT{%{configpath},/var/{cache,log}/lxc}
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	pcdatadir=%{_pkgconfigdir}
@@ -227,7 +227,8 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %dir %{configpath}
-%dir /var/cache/lxc
+%dir %attr(750,root,root) /var/log/lxc
+%dir %attr(750,root,root) /var/cache/lxc
 
 %files devel
 %defattr(644,root,root,755)
