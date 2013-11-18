@@ -237,8 +237,15 @@ lxc.autodev = $auto_dev
 # When using LXC with apparmor, uncomment the next line to run unconfined:
 #lxc.aa_profile = unconfined
 
-#cgroups
+## Devices
+# Allow all devices
+#lxc.cgroup.devices.allow = a
+# Deny all devices
 lxc.cgroup.devices.deny = a
+# Allow to mknod all devices (but not using them)
+lxc.cgroup.devices.allow = c *:* m
+lxc.cgroup.devices.allow = b *:* m
+
 # /dev/null and zero
 lxc.cgroup.devices.allow = c 1:3 rwm
 lxc.cgroup.devices.allow = c 1:5 rwm
