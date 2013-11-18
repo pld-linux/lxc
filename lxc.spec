@@ -38,6 +38,7 @@ BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
 Requires:	which
 Suggests:	net-tools
+Suggests:	rsync
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		configpath	/var/lib/lxc
