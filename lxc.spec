@@ -5,23 +5,21 @@
 %bcond_without	lua	# Lua binding
 %bcond_without	python	# Python binding
 
-Summary:	Linux Container Tools
+%define		subver	alpha3
+%define		rel		0.1
+Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	0.9.0
-Release:	6
+Version:	1.0.0
+Release:	0.%{subver}.%{rel}
 License:	LGPL v2.1+
 Group:		Applications/System
-Source0:	http://lxc.sourceforge.net/download/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	8552a4479090616f4bc04d8473765fc9
+Source0:	https://github.com/lxc/lxc/archive/%{name}-%{version}.%{subver}.tar.gz
+# Source0-md5:	268ff3d825df48badeea2b650ee86cb3
 Source1:	%{name}-pld.in.sh
-Patch0:		%{name}-devpts.patch
 Patch1:		%{name}-pld.patch
-Patch2:		am-1.14.patch
-Patch3:		checkconfig-module.patch
 Patch4:		checkconfig-vserver-config.patch
-Patch5:		fedora-template.patch
-URL:		http://lxc.sourceforge.net/
+URL:		http://linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 BuildRequires:	docbook-dtd30-sgml
@@ -102,13 +100,9 @@ Python (3.x) binding for LXC.
 Wiązanie Pythona (3.x) do LXC.
 
 %prep
-%setup -q
-%patch0 -p1
+%setup -q -n %{name}-%{name}-%{version}%{?subver:.%{subver}}
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 %patch4 -p1
-%patch5 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 
@@ -122,7 +116,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	--disable-rpath \
 	--enable-doc \
 	%{__enable_disable apparmor} \
-	%{__enable_disable lua} \
+	%{__enable_disable lua} %{?with_lua:--with-lua-pc=lua51} \
 	%{__enable_disable python} \
 	%{__enable_disable seccomp} \
 	--with-config-path=%{configpath} \
@@ -159,12 +153,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
+%doc AUTHORS CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
 %attr(755,root,root) %{_bindir}/lxc-attach
 %attr(755,root,root) %{_bindir}/lxc-cgroup
 %attr(755,root,root) %{_bindir}/lxc-checkconfig
 %attr(755,root,root) %{_bindir}/lxc-checkpoint
 %attr(755,root,root) %{_bindir}/lxc-clone
+%attr(755,root,root) %{_bindir}/lxc-config
 %attr(755,root,root) %{_bindir}/lxc-console
 %attr(755,root,root) %{_bindir}/lxc-create
 %attr(755,root,root) %{_bindir}/lxc-destroy
@@ -173,18 +168,20 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-info
 %attr(755,root,root) %{_bindir}/lxc-kill
 %attr(755,root,root) %{_bindir}/lxc-monitor
+%attr(755,root,root) %{_bindir}/lxc-monitord
 %attr(755,root,root) %{_bindir}/lxc-netstat
 %attr(755,root,root) %{_bindir}/lxc-ps
 %attr(755,root,root) %{_bindir}/lxc-restart
-%attr(755,root,root) %{_bindir}/lxc-shutdown
+%attr(755,root,root) %{_bindir}/lxc-snapshot
 %attr(755,root,root) %{_bindir}/lxc-start
 %attr(755,root,root) %{_bindir}/lxc-stop
 %attr(755,root,root) %{_bindir}/lxc-unfreeze
 %attr(755,root,root) %{_bindir}/lxc-unshare
+%attr(755,root,root) %{_bindir}/lxc-user-nic
 %attr(755,root,root) %{_bindir}/lxc-version
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/liblxc.so.0
+%attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 %dir %{_libdir}/lxc
 %dir %{_libdir}/lxc/rootfs
 %{_libdir}/lxc/rootfs/README
@@ -196,6 +193,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/templates
 %attr(755,root,root) %{_datadir}/%{name}/hooks/mount*
+%attr(755,root,root) %{_datadir}/%{name}/hooks/clonehostname
+%attr(755,root,root) %{_datadir}/%{name}/hooks/ubuntu-cloud-prep
 %attr(755,root,root) %{_datadir}/%{name}/templates/lxc-*
 %{_mandir}/man1/lxc-attach.1*
 %{_mandir}/man1/lxc-cgroup.1*
@@ -213,7 +212,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/lxc-netstat.1*
 %{_mandir}/man1/lxc-ps.1*
 %{_mandir}/man1/lxc-restart.1*
-%{_mandir}/man1/lxc-shutdown.1*
+%{_mandir}/man1/lxc-snapshot.1*
 %{_mandir}/man1/lxc-start.1*
 %{_mandir}/man1/lxc-stop.1*
 %{_mandir}/man1/lxc-unfreeze.1*
@@ -222,6 +221,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/lxc-wait.1*
 %{_mandir}/man5/lxc.conf.5*
 %{_mandir}/man7/lxc.7*
+%lang(ja) %{_mandir}/ja/man1/lxc*.1*
+%lang(ja) %{_mandir}/ja/man5/lxc.conf.5*
+%lang(ja) %{_mandir}/ja/man7/lxc.7*
+%exclude %{_mandir}/ja/man1/lxc-device.1*
+%exclude %{_mandir}/ja/man1/lxc-ls.1*
+%exclude %{_mandir}/ja/man1/lxc-start-ephemeral.1*
+%exclude %{_mandir}/ja/man1/lxc-top.1*
+
 %if %{without python}
 # legacy version
 %attr(755,root,root) %{_bindir}/lxc-ls
@@ -242,10 +249,11 @@ rm -rf $RPM_BUILD_ROOT
 %files -n lua-lxc
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/lxc-top
-%dir %{_libdir}/lua/5.1/lxc
-%attr(755,root,root) %{_libdir}/lua/5.1/lxc/core.so
-%{_datadir}/lua/5.1/lxc.lua
+%dir %{_libdir}/lua/lxc
+%attr(755,root,root) %{_libdir}/lua/lxc/core.so
+%{_datadir}/lua/lxc.lua
 %{_mandir}/man1/lxc-top.1*
+%lang(ja) %{_mandir}/ja/man1/lxc-top.1*
 %endif
 
 %if %{with python}
@@ -260,4 +268,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/lxc-device.1*
 %{_mandir}/man1/lxc-ls.1*
 %{_mandir}/man1/lxc-start-ephemeral.1*
+%lang(ja) %{_mandir}/ja/man1/lxc-device.1*
+%lang(ja) %{_mandir}/ja/man1/lxc-ls.1*
+%lang(ja) %{_mandir}/ja/man1/lxc-start-ephemeral.1*
 %endif

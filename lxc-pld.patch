@@ -1,38 +1,29 @@
---- lxc-0.9.0/configure.ac	2013-11-17 11:42:38.205255771 +0200
-+++ lxc-0.9.0/configure.ac	2013-04-17 20:04:27.905564169 +0200
-@@ -67,7 +67,7 @@
+--- lxc-lxc-1.0.0.alpha3/configure.ac~	2013-11-15 23:08:17.000000000 +0200
++++ lxc-lxc-1.0.0.alpha3/configure.ac	2013-11-20 01:01:35.253197161 +0200
+@@ -81,7 +81,7 @@
+ 
+ if test "x$enable_doc" = "xyes" -o "x$enable_doc" = "xauto"; then
  	db2xman=""
+-	dbparsers="docbook2x-man db2x_docbook2man docbook2man"
++	dbparsers="docbook2X2man docbook2x-man db2x_docbook2man docbook2man"
  
  	AC_MSG_CHECKING(for docbook2x-man)
--	for name in docbook2x-man db2x_docbook2man; do
-+	for name in docbook2X2man docbook2x-man db2x_docbook2man; do
- 		if "$name" --help >/dev/null 2>&1; then
- 			db2xman="$name"
- 			break;
-@@ -140,6 +140,8 @@
- # Lua module and scripts
- if test x"$with_distro" = "xdebian" -o x"$with_distro" = "xubuntu" ; then
-     LUAPKGCONFIG=lua5.1
-+elif test x"$with_distro" = "xpld"; then
-+    LUAPKGCONFIG=lua51
- else
-     LUAPKGCONFIG=lua
- fi
-@@ -363,6 +365,7 @@
+ 	for name in ${dbparsers}; do
+@@ -525,6 +525,7 @@
  	templates/lxc-opensuse
  	templates/lxc-busybox
  	templates/lxc-fedora
 +	templates/lxc-pld
+ 	templates/lxc-openmandriva
  	templates/lxc-oracle
  	templates/lxc-altlinux
- 	templates/lxc-sshd
---- lxc-0.9.0/templates/Makefile.am~	2013-03-19 00:17:01.000000000 +0200
-+++ lxc-0.9.0/templates/Makefile.am	2013-11-17 03:44:48.326889371 +0200
+--- lxc-lxc-1.0.0.alpha3/templates/Makefile.am~	2013-11-15 23:08:17.000000000 +0200
++++ lxc-lxc-1.0.0.alpha3/templates/Makefile.am	2013-11-20 01:04:32.994128379 +0200
 @@ -6,6 +6,7 @@
  	lxc-ubuntu-cloud \
  	lxc-opensuse \
  	lxc-fedora \
 +	lxc-pld \
+ 	lxc-openmandriva \
  	lxc-oracle \
  	lxc-altlinux \
- 	lxc-busybox \
