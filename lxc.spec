@@ -4,8 +4,9 @@
 %bcond_without	apparmor	# apparmor
 %bcond_without	lua	# Lua binding
 %bcond_without	python	# Python binding
+%bcond_with	selinux	# SELinux
 
-%define		subver	alpha3
+%define		subver	beta1
 %define		rel		0.1
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
@@ -15,7 +16,7 @@ Release:	0.%{subver}.%{rel}
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://github.com/lxc/lxc/archive/%{name}-%{version}.%{subver}.tar.gz
-# Source0-md5:	268ff3d825df48badeea2b650ee86cb3
+# Source0-md5:	82ddad563fe31b80595543d838788551
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 Patch4:		checkconfig-vserver-config.patch
@@ -115,11 +116,14 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	db2xman=docbook2X2man \
 	--disable-rpath \
 	--enable-doc \
+	--enable-examples \
 	%{__enable_disable apparmor} \
 	%{__enable_disable lua} %{?with_lua:--with-lua-pc=lua51} \
 	%{__enable_disable python} \
 	%{__enable_disable seccomp} \
+	%{__enable_disable selinux} \
 	--with-config-path=%{configpath} \
+	--with-init-script=sysv,systemd \
 	--with-distro=pld
 
 %{__make}
@@ -178,6 +182,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-unfreeze
 %attr(755,root,root) %{_bindir}/lxc-unshare
 %attr(755,root,root) %{_bindir}/lxc-user-nic
+%attr(755,root,root) %{_bindir}/lxc-usernsexec
 %attr(755,root,root) %{_bindir}/lxc-version
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
@@ -188,8 +193,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/lxc/lxc-init
 %dir %{_sysconfdir}/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
-%dir %{_datadir}/lxc
+%dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
+%dir %{_datadir}/%{name}/config
+%{_datadir}/%{name}/config/ubuntu*.conf
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/templates
 %attr(755,root,root) %{_datadir}/%{name}/hooks/mount*
@@ -217,8 +224,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/lxc-stop.1*
 %{_mandir}/man1/lxc-unfreeze.1*
 %{_mandir}/man1/lxc-unshare.1*
+%{_mandir}/man1/lxc-user-nic.1*
 %{_mandir}/man1/lxc-version.1*
 %{_mandir}/man1/lxc-wait.1*
+%{_mandir}/man5/lxc-usernet.5*
 %{_mandir}/man5/lxc.conf.5*
 %{_mandir}/man7/lxc.7*
 %lang(ja) %{_mandir}/ja/man1/lxc*.1*
