@@ -93,6 +93,7 @@ Summary(pl.UTF-8):	Wiązanie Pythona (3.x) do LXC
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	python3-libs >= 3.2
+Requires:	python3-modules
 
 %description -n python3-lxc
 Python (3.x) binding for LXC.
