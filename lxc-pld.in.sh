@@ -173,7 +173,7 @@ copy_pld()
 
 	# make a local copy of the minipld
 	echo -n "Copying rootfs to $rootfs_path ..."
-	cp -a $cache/rootfs/ $rootfs_path || return 1
+	cp -a $cache/rootfs/* $rootfs_path || return 1
 	return 0
 }
 
