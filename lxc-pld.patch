@@ -1,29 +1,29 @@
---- lxc-lxc-1.0.0.alpha3/configure.ac~	2013-11-15 23:08:17.000000000 +0200
-+++ lxc-lxc-1.0.0.alpha3/configure.ac	2013-11-20 01:01:35.253197161 +0200
-@@ -81,7 +81,7 @@
+--- lxc-lxc-1.0.0.beta2/configure.ac~	2014-01-16 02:07:33.000000000 +0200
++++ lxc-lxc-1.0.0.beta2/configure.ac	2014-02-13 10:09:36.273870378 +0200
+@@ -136,7 +136,7 @@
  
  if test "x$enable_doc" = "xyes" -o "x$enable_doc" = "xauto"; then
  	db2xman=""
--	dbparsers="docbook2x-man db2x_docbook2man docbook2man"
-+	dbparsers="docbook2X2man docbook2x-man db2x_docbook2man docbook2man"
+-	dbparsers="docbook2x-man db2x_docbook2man docbook2man docbook-to-man"
++	dbparsers="docbook2X2man docbook2x-man db2x_docbook2man docbook2man docbook-to-man"
  
  	AC_MSG_CHECKING(for docbook2x-man)
  	for name in ${dbparsers}; do
-@@ -525,6 +525,7 @@
+@@ -650,6 +650,7 @@
  	templates/lxc-opensuse
- 	templates/lxc-busybox
- 	templates/lxc-fedora
-+	templates/lxc-pld
- 	templates/lxc-openmandriva
  	templates/lxc-oracle
- 	templates/lxc-altlinux
---- lxc-lxc-1.0.0.alpha3/templates/Makefile.am~	2013-11-15 23:08:17.000000000 +0200
-+++ lxc-lxc-1.0.0.alpha3/templates/Makefile.am	2013-11-20 01:04:32.994128379 +0200
-@@ -6,6 +6,7 @@
- 	lxc-ubuntu-cloud \
+ 	templates/lxc-plamo
++	templates/lxc-pld
+ 	templates/lxc-sshd
+ 	templates/lxc-ubuntu
+ 	templates/lxc-ubuntu-cloud
+--- lxc-lxc-1.0.0.beta2/templates/Makefile.am~	2014-01-16 02:07:33.000000000 +0200
++++ lxc-lxc-1.0.0.beta2/templates/Makefile.am	2014-02-13 10:10:14.378961481 +0200
+@@ -15,6 +15,7 @@
  	lxc-opensuse \
- 	lxc-fedora \
-+	lxc-pld \
- 	lxc-openmandriva \
  	lxc-oracle \
- 	lxc-altlinux \
+ 	lxc-plamo \
++	lxc-pld \
+ 	lxc-sshd \
+ 	lxc-ubuntu \
+ 	lxc-ubuntu-cloud

@@ -6,7 +6,7 @@
 %bcond_without	python	# Python binding
 %bcond_with	selinux	# SELinux
 
-%define		subver	beta1
+%define		subver	beta2
 %define		rel		0.1
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
@@ -16,7 +16,7 @@ Release:	0.%{subver}.%{rel}
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://github.com/lxc/lxc/archive/%{name}-%{version}.%{subver}.tar.gz
-# Source0-md5:	82ddad563fe31b80595543d838788551
+# Source0-md5:	cdb6b00594ae3423c0745e4e24d807c7
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 Patch4:		checkconfig-vserver-config.patch
@@ -26,6 +26,7 @@ BuildRequires:	automake
 BuildRequires:	docbook-dtd30-sgml
 BuildRequires:	docbook-utils
 BuildRequires:	docbook2X
+BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
@@ -134,8 +135,9 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{configpath},/var/{cache,log}/lxc}
 %{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	pcdatadir=%{_pkgconfigdir}
+	SYSTEMD_UNIT_DIR=%{systemdunitdir} \
+	pcdatadir=%{_pkgconfigdir} \
+	DESTDIR=$RPM_BUILD_ROOT
 
 %{__make} -C doc install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -160,6 +162,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
 %attr(755,root,root) %{_bindir}/lxc-attach
+%attr(755,root,root) %{_bindir}/lxc-autostart
 %attr(755,root,root) %{_bindir}/lxc-cgroup
 %attr(755,root,root) %{_bindir}/lxc-checkconfig
 %attr(755,root,root) %{_bindir}/lxc-checkpoint
@@ -188,23 +191,31 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
+%attr(754,root,root) /etc/rc.d/init.d/lxc
+%{systemdunitdir}/lxc.service
 %dir %{_libdir}/lxc
 %dir %{_libdir}/lxc/rootfs
 %{_libdir}/lxc/rootfs/README
+%attr(755,root,root) %{_libdir}/lxc/lxc-devsetup
 %attr(755,root,root) %{_libdir}/lxc/lxc-init
 %dir %{_sysconfdir}/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
 %dir %{_datadir}/%{name}/config
+%{_datadir}/%{name}/config/debian*.conf
+%{_datadir}/%{name}/config/oracle*.conf
+%{_datadir}/%{name}/config/plamo*.conf
 %{_datadir}/%{name}/config/ubuntu*.conf
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/templates
-%attr(755,root,root) %{_datadir}/%{name}/hooks/mount*
 %attr(755,root,root) %{_datadir}/%{name}/hooks/clonehostname
+%attr(755,root,root) %{_datadir}/%{name}/hooks/mount*
+%attr(755,root,root) %{_datadir}/%{name}/hooks/squid-deb-proxy-client
 %attr(755,root,root) %{_datadir}/%{name}/hooks/ubuntu-cloud-prep
 %attr(755,root,root) %{_datadir}/%{name}/templates/lxc-*
 %{_mandir}/man1/lxc-attach.1*
+%{_mandir}/man1/lxc-autostart.1*
 %{_mandir}/man1/lxc-cgroup.1*
 %{_mandir}/man1/lxc-checkconfig.1*
 %{_mandir}/man1/lxc-checkpoint.1*
@@ -232,6 +243,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man5/lxc.conf.5*
 %{_mandir}/man7/lxc.7*
 %lang(ja) %{_mandir}/ja/man1/lxc*.1*
+%lang(ja) %{_mandir}/ja/man5/lxc-usernet.5*
 %lang(ja) %{_mandir}/ja/man5/lxc.conf.5*
 %lang(ja) %{_mandir}/ja/man7/lxc.7*
 %exclude %{_mandir}/ja/man1/lxc-device.1*
