@@ -10,7 +10,7 @@
 %bcond_with	selinux	# SELinux
 %bcond_with	cgmanager	# Enable cgmanager (BR: libcgmanager, libnih >= 1.0.2, libnih-dbus >= 1.0.0, dbus-1 >= 1.2.16)
 
-%define		subver	beta3
+%define		subver	beta4
 %define		rel		0.1
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
@@ -20,7 +20,7 @@ Release:	0.%{subver}.%{rel}
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://github.com/lxc/lxc/archive/%{name}-%{version}.%{subver}.tar.gz
-# Source0-md5:	b2ea21f87fa79e89990e41557d675d19
+# Source0-md5:	0758a140d451e41801588320b2192fcd
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 Patch4:		checkconfig-vserver-config.patch
@@ -205,6 +205,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/config/centos.*.conf
 %{_datadir}/%{name}/config/debian.*.conf
 %{_datadir}/%{name}/config/fedora.*.conf
+%{_datadir}/%{name}/config/gentoo.*.conf
 %{_datadir}/%{name}/config/oracle.*.conf
 %{_datadir}/%{name}/config/plamo.*.conf
 %{_datadir}/%{name}/config/ubuntu-cloud.*.conf
