@@ -1,12 +1,16 @@
-#
+# TODO
+# - bash-completion: /etc/bash_completion.d/lxc
+# - package apparmor stuff
+
 # Conditional build:
 %bcond_without	seccomp	# SecComp syscall filter
 %bcond_without	apparmor	# apparmor
 %bcond_without	lua	# Lua binding
 %bcond_without	python	# Python binding
 %bcond_with	selinux	# SELinux
+%bcond_with	cgmanager	# Enable cgmanager (BR: libcgmanager, libnih >= 1.0.2, libnih-dbus >= 1.0.0, dbus-1 >= 1.2.16)
 
-%define		subver	beta2
+%define		subver	beta3
 %define		rel		0.1
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
@@ -16,7 +20,7 @@ Release:	0.%{subver}.%{rel}
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://github.com/lxc/lxc/archive/%{name}-%{version}.%{subver}.tar.gz
-# Source0-md5:	cdb6b00594ae3423c0745e4e24d807c7
+# Source0-md5:	b2ea21f87fa79e89990e41557d675d19
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 Patch4:		checkconfig-vserver-config.patch
@@ -117,6 +121,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 %configure \
 	db2xman=docbook2X2man \
 	--disable-rpath \
+	--enable-bash \
 	--enable-doc \
 	--enable-examples \
 	%{__enable_disable apparmor} \
@@ -125,7 +130,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	%{__enable_disable seccomp} \
 	%{__enable_disable selinux} \
 	--with-config-path=%{configpath} \
-	--with-init-script=sysv,systemd \
+	--with-init-script=sysvinit,systemd \
 	--with-distro=pld
 
 %{__make}
@@ -165,7 +170,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-autostart
 %attr(755,root,root) %{_bindir}/lxc-cgroup
 %attr(755,root,root) %{_bindir}/lxc-checkconfig
-%attr(755,root,root) %{_bindir}/lxc-checkpoint
 %attr(755,root,root) %{_bindir}/lxc-clone
 %attr(755,root,root) %{_bindir}/lxc-config
 %attr(755,root,root) %{_bindir}/lxc-console
@@ -174,39 +178,37 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-execute
 %attr(755,root,root) %{_bindir}/lxc-freeze
 %attr(755,root,root) %{_bindir}/lxc-info
-%attr(755,root,root) %{_bindir}/lxc-kill
 %attr(755,root,root) %{_bindir}/lxc-monitor
-%attr(755,root,root) %{_bindir}/lxc-monitord
-%attr(755,root,root) %{_bindir}/lxc-netstat
-%attr(755,root,root) %{_bindir}/lxc-ps
-%attr(755,root,root) %{_bindir}/lxc-restart
 %attr(755,root,root) %{_bindir}/lxc-snapshot
 %attr(755,root,root) %{_bindir}/lxc-start
 %attr(755,root,root) %{_bindir}/lxc-stop
 %attr(755,root,root) %{_bindir}/lxc-unfreeze
 %attr(755,root,root) %{_bindir}/lxc-unshare
-%attr(755,root,root) %{_bindir}/lxc-user-nic
 %attr(755,root,root) %{_bindir}/lxc-usernsexec
-%attr(755,root,root) %{_bindir}/lxc-version
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 %attr(754,root,root) /etc/rc.d/init.d/lxc
 %{systemdunitdir}/lxc.service
-%dir %{_libdir}/lxc
-%dir %{_libdir}/lxc/rootfs
-%{_libdir}/lxc/rootfs/README
-%attr(755,root,root) %{_libdir}/lxc/lxc-devsetup
-%attr(755,root,root) %{_libdir}/lxc/lxc-init
+%dir %{_libdir}/%{name}
+%dir %{_libdir}/%{name}/rootfs
+%{_libdir}/%{name}/rootfs/README
+%attr(755,root,root) %{_libdir}/%{name}/lxc-devsetup
+%attr(755,root,root) %{_libdir}/%{name}/lxc-init
+%attr(755,root,root) %{_libdir}/%{name}/lxc-monitord
+%attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
 %dir %{_sysconfdir}/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
 %dir %{_datadir}/%{name}/config
-%{_datadir}/%{name}/config/debian*.conf
-%{_datadir}/%{name}/config/oracle*.conf
-%{_datadir}/%{name}/config/plamo*.conf
-%{_datadir}/%{name}/config/ubuntu*.conf
+%{_datadir}/%{name}/config/centos.*.conf
+%{_datadir}/%{name}/config/debian.*.conf
+%{_datadir}/%{name}/config/fedora.*.conf
+%{_datadir}/%{name}/config/oracle.*.conf
+%{_datadir}/%{name}/config/plamo.*.conf
+%{_datadir}/%{name}/config/ubuntu-cloud.*.conf
+%{_datadir}/%{name}/config/ubuntu.*.conf
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/templates
 %attr(755,root,root) %{_datadir}/%{name}/hooks/clonehostname
@@ -218,33 +220,33 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/lxc-autostart.1*
 %{_mandir}/man1/lxc-cgroup.1*
 %{_mandir}/man1/lxc-checkconfig.1*
-%{_mandir}/man1/lxc-checkpoint.1*
 %{_mandir}/man1/lxc-clone.1*
+%{_mandir}/man1/lxc-config.1*
 %{_mandir}/man1/lxc-console.1*
 %{_mandir}/man1/lxc-create.1*
 %{_mandir}/man1/lxc-destroy.1*
 %{_mandir}/man1/lxc-execute.1*
 %{_mandir}/man1/lxc-freeze.1*
 %{_mandir}/man1/lxc-info.1*
-%{_mandir}/man1/lxc-kill.1*
 %{_mandir}/man1/lxc-monitor.1*
-%{_mandir}/man1/lxc-netstat.1*
-%{_mandir}/man1/lxc-ps.1*
-%{_mandir}/man1/lxc-restart.1*
 %{_mandir}/man1/lxc-snapshot.1*
 %{_mandir}/man1/lxc-start.1*
 %{_mandir}/man1/lxc-stop.1*
 %{_mandir}/man1/lxc-unfreeze.1*
 %{_mandir}/man1/lxc-unshare.1*
 %{_mandir}/man1/lxc-user-nic.1*
-%{_mandir}/man1/lxc-version.1*
+%{_mandir}/man1/lxc-usernsexec.1*
 %{_mandir}/man1/lxc-wait.1*
 %{_mandir}/man5/lxc-usernet.5*
 %{_mandir}/man5/lxc.conf.5*
+%{_mandir}/man5/lxc.container.conf.5*
+%{_mandir}/man5/lxc.system.conf.5*
 %{_mandir}/man7/lxc.7*
 %lang(ja) %{_mandir}/ja/man1/lxc*.1*
 %lang(ja) %{_mandir}/ja/man5/lxc-usernet.5*
 %lang(ja) %{_mandir}/ja/man5/lxc.conf.5*
+%lang(ja) %{_mandir}/ja/man5/lxc.container.conf.5*
+%lang(ja) %{_mandir}/ja/man5/lxc.system.conf.5*
 %lang(ja) %{_mandir}/ja/man7/lxc.7*
 %exclude %{_mandir}/ja/man1/lxc-device.1*
 %exclude %{_mandir}/ja/man1/lxc-ls.1*
