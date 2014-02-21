@@ -10,20 +10,17 @@
 %bcond_with	selinux	# SELinux
 %bcond_with	cgmanager	# Enable cgmanager (BR: libcgmanager, libnih >= 1.0.2, libnih-dbus >= 1.0.0, dbus-1 >= 1.2.16)
 
-%define		subver	beta4
-%define		rel		0.1
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	1.0.0
-Release:	0.%{subver}.%{rel}
+Release:	0.2
 License:	LGPL v2.1+
 Group:		Applications/System
-Source0:	https://github.com/lxc/lxc/archive/%{name}-%{version}.%{subver}.tar.gz
-# Source0-md5:	0758a140d451e41801588320b2192fcd
+Source0:	http://linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
+# Source0-md5:	87a9d168a6e55326303cce3b2cb7f82e
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
-Patch4:		checkconfig-vserver-config.patch
 URL:		http://linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -107,9 +104,8 @@ Python (3.x) binding for LXC.
 Wiązanie Pythona (3.x) do LXC.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}%{?subver:.%{subver}}
+%setup -q
 %patch1 -p1
-%patch4 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 
@@ -131,6 +127,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	%{__enable_disable selinux} \
 	--with-config-path=%{configpath} \
 	--with-init-script=sysvinit,systemd \
+	--with-runtime-path=/var/run \
 	--with-distro=pld
 
 %{__make}
