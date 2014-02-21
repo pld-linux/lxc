@@ -173,7 +173,7 @@ copy_pld()
 
 	# make a local copy of the minipld
 	echo -n "Copying rootfs to $rootfs_path ..."
-	cp -a $cache/rootfs/ $rootfs_path || return 1
+	cp -a $cache/rootfs/* $rootfs_path || return 1
 	return 0
 }
 
@@ -187,7 +187,7 @@ install_pld()
 {
 	mkdir -p @LOCALSTATEDIR@/lock/subsys/
 	(
-		flock -x 200
+		flock -x 9
 		if [ $? -ne 0 ]; then
 			echo "Cache repository is busy."
 			return 1
@@ -218,7 +218,7 @@ install_pld()
 		fi
 
 		return 0
-	) 200>@LOCALSTATEDIR@/lock/subsys/lxc-pld
+	) 9>@LOCALSTATEDIR@/lock/subsys/lxc-pld
 
 	return $?
 }
@@ -287,7 +287,7 @@ clean()
 
 	# lock, so we won't purge while someone is creating a repository
 	(
-		flock -x 200
+		flock -x 9
 		if [ $? != 0 ]; then
 			echo "Cache repository is busy."
 			exit 1
@@ -296,7 +296,7 @@ clean()
 		echo -n "Purging the download cache for PLD Linux $release..."
 		rm --preserve-root --one-file-system -rf $cache && echo "Done." || exit 1
 		exit 0
-	) 200>@LOCALSTATEDIR@/lock/subsys/lxc-pld
+	) 9>@LOCALSTATEDIR@/lock/subsys/lxc-pld
 }
 
 usage()
