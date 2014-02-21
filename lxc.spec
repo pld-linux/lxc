@@ -1,5 +1,4 @@
 # TODO
-# - bash-completion: /etc/bash_completion.d/lxc
 # - package apparmor stuff
 
 # Conditional build:
@@ -102,6 +101,19 @@ Python (3.x) binding for LXC.
 
 %description -n python3-lxc -l pl.UTF-8
 Wiązanie Pythona (3.x) do LXC.
+
+%package -n bash-completion-%{name}
+Summary:	bash-completion for LXC
+Summary(pl.UTF-8):	bashowe uzupełnianie nazw dla LXC
+Group:		Applications/Shells
+Requires:	%{name}
+Requires:	bash-completion
+
+%description -n bash-completion-%{name}
+bash-completion for LXC.
+
+%description -n bash-completion-%{name} -l pl.UTF-8
+bashowe uzupełnianie nazw dla LXC.
 
 %prep
 %setup -q
@@ -294,3 +306,7 @@ rm -rf $RPM_BUILD_ROOT
 %lang(ja) %{_mandir}/ja/man1/lxc-ls.1*
 %lang(ja) %{_mandir}/ja/man1/lxc-start-ephemeral.1*
 %endif
+
+%files -n bash-completion-%{name}
+%defattr(644,root,root,755)
+/etc/bash_completion.d/lxc
