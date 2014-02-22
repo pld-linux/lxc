@@ -38,6 +38,8 @@ BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
 Requires:	which
 Suggests:	gnupg
+Suggests:	gnupg-plugin-keys_curl
+Suggests:	gnupg-plugin-keys_hkp
 Suggests:	net-tools
 Suggests:	rsync
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
