@@ -13,7 +13,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	1.0.0
-Release:	0.2
+Release:	0.3
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	http://linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
@@ -147,7 +147,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{configpath},/var/{cache,log}/lxc}
+install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 %{__make} install \
 	SYSTEMD_UNIT_DIR=%{systemdunitdir} \
 	pcdatadir=%{_pkgconfigdir} \
@@ -270,6 +270,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %dir %{configpath}
+%dir %{configpath}snap
 %dir %attr(750,root,root) /var/log/lxc
 %dir %attr(750,root,root) /var/cache/lxc
 
