@@ -12,15 +12,15 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.0.0
+Version:	1.0.1
 Release:	0.3
 License:	LGPL v2.1+
 Group:		Applications/System
-Source0:	http://linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	87a9d168a6e55326303cce3b2cb7f82e
+Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
+# Source0-md5:	3c7379891e45713817ec873a167070b0
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
-URL:		http://linuxcontainers.org/
+URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 BuildRequires:	docbook-dtd30-sgml
@@ -160,6 +160,9 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 	DESTDIR=$RPM_BUILD_ROOT
 
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}
+
+# apparmor profiles are not packaged, remove to avoid packagers confusion
+%{__rm} -r $RPM_BUILD_ROOT/etc/apparmor.d
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
