@@ -12,12 +12,12 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.0.1
-Release:	0.3
+Version:	1.0.2
+Release:	0.1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	3c7379891e45713817ec873a167070b0
+# Source0-md5:	89cddb431672db355483a96046f7fd95
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 URL:		https://www.linuxcontainers.org/
