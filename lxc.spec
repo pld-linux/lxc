@@ -12,12 +12,12 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.0.2
+Version:	1.0.3
 Release:	0.1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	89cddb431672db355483a96046f7fd95
+# Source0-md5:	55873b1411a606397309aa6c4c4263b3
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 URL:		https://www.linuxcontainers.org/
@@ -164,6 +164,9 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 # apparmor profiles are not packaged, remove to avoid packagers confusion
 %{__rm} -r $RPM_BUILD_ROOT/etc/apparmor.d
 
+# yum plugin, no idea where to package this
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/lxc-patch.py
+
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
 %py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
@@ -201,6 +204,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/lxc-unshare
 %attr(755,root,root) %{_bindir}/lxc-usernsexec
 %attr(755,root,root) %{_bindir}/lxc-wait
+%attr(755,root,root) %{_sbindir}/init.lxc
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 %attr(754,root,root) /etc/rc.d/init.d/lxc
@@ -209,7 +213,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/%{name}/rootfs
 %{_libdir}/%{name}/rootfs/README
 %attr(755,root,root) %{_libdir}/%{name}/lxc-devsetup
-%attr(755,root,root) %{_libdir}/%{name}/lxc-init
 %attr(755,root,root) %{_libdir}/%{name}/lxc-monitord
 %attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
 %dir %{_sysconfdir}/lxc
