@@ -12,12 +12,12 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.0.3
+Version:	1.0.4
 Release:	0.1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	55873b1411a606397309aa6c4c4263b3
+# Source0-md5:	2689080af03a8ac1f1ce577728dd3619
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 URL:		https://www.linuxcontainers.org/
@@ -183,7 +183,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS CONTRIBUTING MAINTAINERS README TODO doc/FAQ.txt doc/examples/*.conf
+%doc AUTHORS CONTRIBUTING MAINTAINERS README  doc/FAQ.txt doc/examples/*.conf
 %attr(755,root,root) %{_bindir}/lxc-attach
 %attr(755,root,root) %{_bindir}/lxc-autostart
 %attr(755,root,root) %{_bindir}/lxc-cgroup
@@ -215,6 +215,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/%{name}/lxc-devsetup
 %attr(755,root,root) %{_libdir}/%{name}/lxc-monitord
 %attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
+%attr(755,root,root) %{_libdir}/%{name}/lxc-autostart-helper
 %dir %{_sysconfdir}/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %dir %{_datadir}/%{name}
