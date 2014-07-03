@@ -103,12 +103,8 @@ EOF
 
 configure_pld_init()
 {
-	# Setup getty service on the 4 ttys we are going to allow in the
-	# default config. Number should match lxc.tty
-#	sed -i -e 's///' ${rootfs_path}/etc/inittab
-
-	# nothing done here yet
-	:
+	# default powerfail action waits 2 minutes. for lxc we want it immediately
+	sed -i -e '/^pf::powerfail:/ s,/sbin/shutdown.*,/sbin/halt,' ${rootfs_path}/etc/inittab
 }
 
 configure_pld_systemd()
