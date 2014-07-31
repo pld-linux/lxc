@@ -19,6 +19,7 @@ Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	9d9af9e9e69a831cd50b58d91c786013
 Source1:	%{name}-pld.in.sh
+Source2:        %{name}.init
 Patch1:		%{name}-pld.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
@@ -151,7 +152,10 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
+install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}  \
+        -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+
+
 %{__make} install \
 	SYSTEMD_UNIT_DIR=%{systemdunitdir} \
 	pcdatadir=%{_pkgconfigdir} \
@@ -167,6 +171,8 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 
 # yum plugin, no idea where to package this
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/lxc-patch.py
+
+install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
