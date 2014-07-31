@@ -12,12 +12,12 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.0.4
+Version:	1.0.5
 Release:	0.1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	2689080af03a8ac1f1ce577728dd3619
+# Source0-md5:	9d9af9e9e69a831cd50b58d91c786013
 Source1:	%{name}-pld.in.sh
 Patch1:		%{name}-pld.patch
 URL:		https://www.linuxcontainers.org/
@@ -41,6 +41,7 @@ Suggests:	gnupg
 Suggests:	gnupg-plugin-keys_curl
 Suggests:	gnupg-plugin-keys_hkp
 Suggests:	net-tools
+Suggests:	python3-lxc
 Suggests:	rsync
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -222,6 +223,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/lxc.functions
 %dir %{_datadir}/%{name}/config
 %{_datadir}/%{name}/config/centos.*.conf
+%{_datadir}/%{name}/config/common.seccomp
 %{_datadir}/%{name}/config/debian.*.conf
 %{_datadir}/%{name}/config/fedora.*.conf
 %{_datadir}/%{name}/config/gentoo.*.conf
@@ -272,6 +274,7 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_mandir}/ja/man1/lxc-ls.1*
 %exclude %{_mandir}/ja/man1/lxc-start-ephemeral.1*
 %exclude %{_mandir}/ja/man1/lxc-top.1*
+
 
 %if %{without python}
 # legacy version
