@@ -407,12 +407,15 @@ if [ "$(id -u)" != "0" ]; then
 	exit 1
 fi
 
-if [ -z "$rootfs_path" ]; then
-	rootfs_path=$path/rootfs
-	# check for 'lxc.rootfs' passed in through default config by lxc-create
-	if grep -q '^lxc.rootfs' $path/config 2>/dev/null ; then
-		rootfs_path=$(awk -F= '/^lxc.rootfs =/{ print $2 }' $path/config)
-	fi
+if [ -z "$rootfs" ]; then
+    rootfs_path=$path/rootfs
+    # check for 'lxc.rootfs' passed in through default config by lxc-create
+    # TODO: should be lxc.rootfs.mount used instead?
+    if grep -q '^lxc.rootfs' $path/config 2>/dev/null ; then
+            rootfs_path=$(awk -F= '/^lxc.rootfs =/{ print $2 }' $path/config)
+    fi
+else
+    rootfs_path=$rootfs
 fi
 config_path=$default_path/$name
 cache=$cache_base/$release

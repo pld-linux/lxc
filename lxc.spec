@@ -13,13 +13,13 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	1.0.5
-Release:	0.1
+Release:	0.2
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	9d9af9e9e69a831cd50b58d91c786013
 Source1:	%{name}-pld.in.sh
-Source2:        %{name}.init
+Source2:	%{name}.init
 Patch1:		%{name}-pld.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
@@ -31,9 +31,11 @@ BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
+BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua51-devel >= 5.1}
 BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python3-devel >= 3.2}
+BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.612
 BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
