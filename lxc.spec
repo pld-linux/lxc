@@ -13,7 +13,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	1.0.5
-Release:	2
+Release:	3
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
@@ -181,7 +181,7 @@ install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc
 %py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
 %endif
 %if %{with lua}
-%{__sed} -i -e '1s,#!/usr/bin/env lua,#!/usr/bin/lua51,' $RPM_BUILD_ROOT%{_bindir}/lxc-top
+%{__sed} -i -e '1s,#!/usr/bin/env lua,#!/usr/bin/lua5.1,' $RPM_BUILD_ROOT%{_bindir}/lxc-top
 %endif
 
 %clean
