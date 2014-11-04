@@ -104,10 +104,9 @@ case "$1" in
 	## msg_starting lxc
 	## echo "DEBUG: Launch: /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS"
 	CONTAINERS_LIST=`/usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS --list`
-	## CONTAINERS_LIST=`/usr/bin/lxc-autostart --list`
-	## echo "DEBUG: CONTAINERS_LIST:$CONTAINERS_LIST"
 
-        run_cmd "Starting LXC containers ( $CONTAINERS_LIST ) from groups: $BOOTGROUPS " /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS 
+        ## run_cmd "Starting LXC containers ( $CONTAINERS_LIST ) from groups: $BOOTGROUPS " /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS 
+        run_cmd $nls( "Starting LXC containers (%s) from groups: %s " $CONTAINERS_LIST $BOOTGROUPS) /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS 
 
 	touch "$localstatedir"/lock/subsys/lxc
 	;;
@@ -123,8 +122,8 @@ case "$1" in
 	## action $"Stopping LXC containers: " "$bindir"/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
 	CONTAINERS_LIST=`/usr/bin/lxc-autostart $STOPOPTS --list`
 
-        ## run_cmd "Stopping LXC containsers (CONTAINERS_LIST) from groups BOOTGROUPS "   "$bindir"/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
-	run_cmd "Stopping running LXC containers ($CONTAINERS_LIST) "   "$bindir"/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
+	## run_cmd "Stopping running LXC containers ($CONTAINERS_LIST) "   "$bindir"/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
+	run_cmd $(nls "Stopping running LXC containers (%s) " $CONTAINERS_LIST) /usr/bin/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
 
 	rm -f "$localstatedir"/lock/subsys/lxc
 	;;
