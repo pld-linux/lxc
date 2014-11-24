@@ -106,7 +106,7 @@ case "$1" in
 	CONTAINERS_LIST=`/usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS --list`
 
         ## run_cmd "Starting LXC containers ( $CONTAINERS_LIST ) from groups: $BOOTGROUPS " /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS 
-        run_cmd $nls( "Starting LXC containers (%s) from groups: %s " $CONTAINERS_LIST $BOOTGROUPS) /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS 
+        run_cmd $(nls "Starting LXC containers (%s) from groups: %s " $CONTAINERS_LIST $BOOTGROUPS) /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS
 
 	touch "$localstatedir"/lock/subsys/lxc
 	;;
