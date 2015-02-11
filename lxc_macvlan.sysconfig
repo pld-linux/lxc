@@ -1,0 +1,14 @@
+# LXC MACVLAN device config 
+
+# Logical interface name
+MACVLAN_NAME=macv0
+
+# Physical device name where logcial interfaces will be created
+MACVLAN_DEV=eth0
+
+# Host address in MACVLAN network
+MACVLAN_ADDRESS=10.0.0.1/23
+
+# Optional MAC address, must be unique.
+# If not set, will be calculated to 00:16:3e:xx:xx:xx where last six octets  will be last six octets from MACVLAN_ADDRESS  
+# MACVLAN_HWADDRESS=00:16:3e:00:00:01

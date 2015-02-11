@@ -13,13 +13,15 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	1.0.7
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	b48f468a9bef0e4e140dd723f0a65ad0
 Source1:	%{name}-pld.in.sh
 Source2:	%{name}.init
+Source3:	%{name}_macvlan.init
+Source4:	%{name}_macvlan.sysconfig
 Patch1:		%{name}-pld.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
@@ -155,8 +157,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}  \
-        -d $RPM_BUILD_ROOT/etc/rc.d/init.d
-
+        -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,sysconfig}
 
 %{__make} install \
 	SYSTEMD_UNIT_DIR=%{systemdunitdir} \
@@ -175,6 +176,8 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/lxc-patch.py
 
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc
+install -p %{SOURCE3} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc_macvlan
+install -p %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
@@ -188,7 +191,21 @@ install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc
 rm -rf $RPM_BUILD_ROOT
 
 %post	-p /sbin/ldconfig
+/sbin/chkconfig --add lxc
+/sbin/chkconfig --add lxc_macvlan
+
+# %service lxc restart
+
+%preun
+if [ "$1" = "0" ]; then
+	%service lxc stop
+	/sbin/chkconfig --del lxc
+	%service lxc_macvlan stop
+	/sbin/chkconfig --del lxc_macvlan
+fi
+
 %postun	-p /sbin/ldconfig
+
 
 %files
 %defattr(644,root,root,755)
@@ -217,6 +234,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 %attr(754,root,root) /etc/rc.d/init.d/lxc
+%attr(754,root,root) /etc/rc.d/init.d/lxc_macvlan
+
 %{systemdunitdir}/lxc.service
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/rootfs
@@ -226,6 +245,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
 %attr(755,root,root) %{_libdir}/%{name}/lxc-autostart-helper
 %dir %{_sysconfdir}/lxc
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc_macvlan
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
