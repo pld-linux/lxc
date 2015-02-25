@@ -39,12 +39,14 @@ fi
 # If not defined MACVLAN_HWADDRESS, calculate it from MACVLAN_ADDRESS
 if [ -z "$MACVLAN_HWADDRESS" ]; then 
     MACVLAN_HWADDRESS=`echo $MACVLAN_ADDRESS | awk -F "/" '{print $1}' | awk -F "." '{ printf "00:16:3e:%x:%x:%x\n", $2, $3, $4 }'`
-    echo "MACVLAN_HWADDRESS not set, using calculated from MACVLAN_ADDRESS=${MACVLAN_ADDRESS} value: ${MACVLAN_HWADDRESS}"; 
+    # TODO: Print on start() only
+    # echo "MACVLAN_HWADDRESS not set, using calculated from MACVLAN_ADDRESS=${MACVLAN_ADDRESS} value: ${MACVLAN_HWADDRESS}"; 
 fi
 
 
 start() {
         msg_starting "LXC macvlan interface"
+	# set -x
 	ip link add link $MACVLAN_DEV name $MACVLAN_NAME address $MACVLAN_HWADDRESS type macvlan mode bridge
 	ip link set $MACVLAN_NAME up
 	ip address add $MACVLAN_ADDRESS brd + dev $MACVLAN_NAME
@@ -57,10 +59,15 @@ start() {
 
 stop() {
         msg_stopping "LXC macvlan interface"
+	# set -x
 	ip link set $MACVLAN_NAME down
 	ip link del $MACVLAN_NAME
         RETVAL=$?
 	[ $RETVAL -eq 0 ] && ok || fail
+}
+
+status() {
+	ip addr show $MACVLAN_NAME 
 }
 
 
@@ -80,6 +87,7 @@ case "$1" in
 	start
 	;;
   status)
+	status
 	;;
   *)
 

@@ -13,7 +13,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	1.0.7
-Release:	2
+Release:	3
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
@@ -42,6 +42,9 @@ BuildRequires:	rpmbuild(macros) >= 1.612
 BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
 Requires:	which
+Requires:	iproute2
+Requires(post,preun):	/sbin/chkconfig
+Requires(post):	/sbin/ldconfig
 Suggests:	gnupg
 Suggests:	gnupg-plugin-keys_curl
 Suggests:	gnupg-plugin-keys_hkp
@@ -190,11 +193,10 @@ install -p %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-p /sbin/ldconfig
+%post	
+/sbin/ldconfig
 /sbin/chkconfig --add lxc
 /sbin/chkconfig --add lxc_macvlan
-
-# %service lxc restart
 
 %preun
 if [ "$1" = "0" ]; then

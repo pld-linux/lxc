@@ -41,7 +41,9 @@ OPTIONS=
 
 # STOPOPTS are stop options.  The can be used for anything else to stop.
 #	If you want to kill containers fast, use -k
-STOPOPTS="-a -s"
+# --all         list all auto-started containers (ignore groups)
+# --shutdown    shutdown the containers instead of starting them
+STOPOPTS="--all --shutdown"
 
 # Source function library.
 test ! -r "$sysconfdir"/rc.d/init.d/functions ||
@@ -98,16 +100,9 @@ case "$1" in
 	fi
 
 	# Start containers
-	## wait_for_bridge
-	# Start autoboot containers first then the NULL group "onboot,".
-	## action $"Starting LXC autoboot containers: " /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS
-	## msg_starting lxc
-	## echo "DEBUG: Launch: /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS"
-	CONTAINERS_LIST=`/usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS --list`
-
-        ## run_cmd "Starting LXC containers ( $CONTAINERS_LIST ) from groups: $BOOTGROUPS " /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS 
-        run_cmd $(nls "Starting LXC containers (%s) from groups: %s " $CONTAINERS_LIST $BOOTGROUPS) /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS
-
+	CONTAINERS_LIST=`/usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS --list | tr '\n' ' '`
+	# echo "DEBUG: CONTAINERS_LIST=${CONTAINERS_LIST}"
+        run_cmd "$(nls "Starting LXC containers (%s) from groups: %s " "$CONTAINERS_LIST" "$BOOTGROUPS")" /usr/bin/lxc-autostart $OPTIONS $BOOTGROUPS
 	touch "$localstatedir"/lock/subsys/lxc
 	;;
   stop)
@@ -119,12 +114,8 @@ case "$1" in
 	# The stop is serialized and can take excessive time.  We need to avoid
 	# delaying the system shutdown / reboot as much as we can since it's not
 	# parallelized...  Even 5 second timout may be too long.
-	## action $"Stopping LXC containers: " "$bindir"/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
-	CONTAINERS_LIST=`/usr/bin/lxc-autostart $STOPOPTS --list`
-
-	## run_cmd "Stopping running LXC containers ($CONTAINERS_LIST) "   "$bindir"/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
-	run_cmd $(nls "Stopping running LXC containers (%s) " $CONTAINERS_LIST) /usr/bin/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
-
+	CONTAINERS_LIST=`/usr/bin/lxc-autostart $STOPOPTS --list | tr '\n' ' '`
+	run_cmd "$(nls "Stopping running LXC containers (%s) " "$CONTAINERS_LIST")" /usr/bin/lxc-autostart $STOPOPTS $SHUTDOWNDELAY
 	rm -f "$localstatedir"/lock/subsys/lxc
 	;;
   restart|reload|force-reload)
@@ -132,7 +123,7 @@ case "$1" in
 	$0 start
 	;;
   status)
-	lxc-ls --fancy   # NOTE: python3-lxc is needed for lxc-ls
+	lxc-ls --fancy  --fancy-format name,state,pid,ipv4,ipv6,memory,ram,swap    # NOTE: python3-lxc is needed for lxc-ls
 	;;
   *)
 	echo $"Usage: $0 {start|stop|restart|reload|force-reload}"
