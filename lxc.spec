@@ -39,11 +39,12 @@ BuildRequires:	libxslt-progs
 BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python3-devel >= 3.2}
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.612
+BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
 Requires:	which
 Requires:	iproute2
+Requires:	systemd-units >= 38
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	/sbin/ldconfig
 Suggests:	gnupg
@@ -197,18 +198,24 @@ rm -rf $RPM_BUILD_ROOT
 %post	
 /sbin/ldconfig
 /sbin/chkconfig --add lxc
+/sbin/chkconfig --add lxc-net
 /sbin/chkconfig --add lxc_macvlan
+%systemd_post lxc.service lxc-net.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service lxc stop
 	/sbin/chkconfig --del lxc
+	%service lxc-net stop
+	/sbin/chkconfig --del lxc-net
 	%service lxc_macvlan stop
 	/sbin/chkconfig --del lxc_macvlan
 fi
+%systemd_preun lxc.service lxc-net.service
 
-%postun	-p /sbin/ldconfig
-
+%postun
+/sbin/ldconfig
+%systemd_reload
 
 %files
 %defattr(644,root,root,755)
