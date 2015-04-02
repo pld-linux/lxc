@@ -1,6 +1,26 @@
---- lxc-lxc-1.0.0.beta2/configure.ac~	2014-01-16 02:07:33.000000000 +0200
-+++ lxc-lxc-1.0.0.beta2/configure.ac	2014-02-13 10:09:36.273870378 +0200
-@@ -136,7 +136,7 @@
+diff -durN -x '*~' -x '*.orig' lxc-1.1.1.orig/configure.ac lxc-1.1.1/configure.ac
+--- lxc-1.1.1.orig/configure.ac	2015-03-16 20:57:47.000000000 +0100
++++ lxc-1.1.1/configure.ac	2015-04-02 14:40:25.000000000 +0200
+@@ -63,7 +63,7 @@
+ 		distroconf=default.conf.lxcbr
+ 		distrosysconf="$sysconfdir/default"
+ 		;;
+-	redhat|centos|fedora|oracle|oracleserver|suse|opensuse*)
++	redhat|centos|fedora|oracle|oracleserver|suse|opensuse*|pld)
+ 		distroconf=default.conf.lxcbr
+ 		distrosysconf="$sysconfdir/sysconfig"
+ 		;;
+@@ -99,6 +99,9 @@
+ 			ubuntu)
+ 				init_script=upstart,systemd
+ 				;;
++			pld)
++				init_script=upstart,systemd
++				;;
+ 			*)
+ 				echo -n "Linux distribution init system unknown."
+ 				init_script=
+@@ -152,7 +154,7 @@
  
  if test "x$enable_doc" = "xyes" -o "x$enable_doc" = "xauto"; then
  	db2xman=""
@@ -9,7 +29,7 @@
  
  	AC_MSG_CHECKING(for docbook2x-man)
  	for name in ${dbparsers}; do
-@@ -650,6 +650,7 @@
+@@ -756,6 +758,7 @@
  	templates/lxc-opensuse
  	templates/lxc-oracle
  	templates/lxc-plamo
@@ -17,8 +37,9 @@
  	templates/lxc-sshd
  	templates/lxc-ubuntu
  	templates/lxc-ubuntu-cloud
---- lxc-lxc-1.0.0.beta2/templates/Makefile.am~	2014-01-16 02:07:33.000000000 +0200
-+++ lxc-lxc-1.0.0.beta2/templates/Makefile.am	2014-02-13 10:10:14.378961481 +0200
+diff -durN -x '*~' -x '*.orig' lxc-1.1.1.orig/templates/Makefile.am lxc-1.1.1/templates/Makefile.am
+--- lxc-1.1.1.orig/templates/Makefile.am	2015-03-16 20:57:47.000000000 +0100
++++ lxc-1.1.1/templates/Makefile.am	2015-04-02 14:38:17.000000000 +0200
 @@ -15,6 +15,7 @@
  	lxc-opensuse \
  	lxc-oracle \

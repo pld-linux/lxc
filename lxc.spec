@@ -1,4 +1,5 @@
 # TODO
+# - what to do lxc_macvlan.init, when upstream provided lxc-net.init?
 # - package apparmor stuff
 
 # Conditional build:
@@ -12,16 +13,15 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.0.7
-Release:	4
+Version:	1.1.1
+Release:	0.1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	b48f468a9bef0e4e140dd723f0a65ad0
+# Source0-md5:	d80cb08f0edf36f0887e32c96aec8c13
 Source1:	%{name}-pld.in.sh
-Source2:	%{name}.init
-Source3:	%{name}_macvlan.init
-Source4:	%{name}_macvlan.sysconfig
+Source2:	%{name}_macvlan.init
+Source3:	%{name}_macvlan.sysconfig
 Patch0:		%{name}-pld.patch
 Patch1:		x32.patch
 URL:		https://www.linuxcontainers.org/
@@ -180,9 +180,8 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 # yum plugin, no idea where to package this
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/lxc-patch.py
 
-install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc
-install -p %{SOURCE3} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc_macvlan
-install -p %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
+install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc_macvlan
+install -p %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
@@ -218,6 +217,7 @@ fi
 %attr(755,root,root) %{_bindir}/lxc-autostart
 %attr(755,root,root) %{_bindir}/lxc-cgroup
 %attr(755,root,root) %{_bindir}/lxc-checkconfig
+%attr(755,root,root) %{_bindir}/lxc-checkpoint
 %attr(755,root,root) %{_bindir}/lxc-clone
 %attr(755,root,root) %{_bindir}/lxc-config
 %attr(755,root,root) %{_bindir}/lxc-console
@@ -238,32 +238,47 @@ fi
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 %attr(754,root,root) /etc/rc.d/init.d/lxc
+%attr(754,root,root) /etc/rc.d/init.d/lxc-net
 %attr(754,root,root) /etc/rc.d/init.d/lxc_macvlan
 
 %{systemdunitdir}/lxc.service
+%{systemdunitdir}/lxc-net.service
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/rootfs
 %{_libdir}/%{name}/rootfs/README
+%attr(755,root,root) %{_libdir}/%{name}/lxc-apparmor-load
+%attr(755,root,root) %{_libdir}/%{name}/lxc-containers
 %attr(755,root,root) %{_libdir}/%{name}/lxc-devsetup
 %attr(755,root,root) %{_libdir}/%{name}/lxc-monitord
+%attr(755,root,root) %{_libdir}/%{name}/lxc-net
 %attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
-%attr(755,root,root) %{_libdir}/%{name}/lxc-autostart-helper
 %dir %{_sysconfdir}/lxc
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc_macvlan
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
+%attr(755,root,root) %{_datadir}/%{name}/lxc-restore-net
 %dir %{_datadir}/%{name}/config
+%{_datadir}/%{name}/config/archlinux.*.conf
 %{_datadir}/%{name}/config/centos.*.conf
+%{_datadir}/%{name}/config/common.conf
+%dir %{_datadir}/%{name}/config/common.conf.d
+%{_datadir}/%{name}/config/common.conf.d/README
 %{_datadir}/%{name}/config/common.seccomp
 %{_datadir}/%{name}/config/debian.*.conf
 %{_datadir}/%{name}/config/fedora.*.conf
 %{_datadir}/%{name}/config/gentoo.*.conf
+%{_datadir}/%{name}/config/opensuse.*.conf
+%{_datadir}/%{name}/config/openwrt.*.conf
 %{_datadir}/%{name}/config/oracle.*.conf
 %{_datadir}/%{name}/config/plamo.*.conf
 %{_datadir}/%{name}/config/ubuntu-cloud.*.conf
 %{_datadir}/%{name}/config/ubuntu.*.conf
+%{_datadir}/%{name}/config/userns.conf
 %dir %{_datadir}/%{name}/hooks
+%dir %{_datadir}/%{name}/selinux
+%{_datadir}/%{name}/selinux/*
 %dir %{_datadir}/%{name}/templates
 %attr(755,root,root) %{_datadir}/%{name}/hooks/clonehostname
 %attr(755,root,root) %{_datadir}/%{name}/hooks/mount*
@@ -274,6 +289,7 @@ fi
 %{_mandir}/man1/lxc-autostart.1*
 %{_mandir}/man1/lxc-cgroup.1*
 %{_mandir}/man1/lxc-checkconfig.1*
+%{_mandir}/man1/lxc-checkpoint.1*
 %{_mandir}/man1/lxc-clone.1*
 %{_mandir}/man1/lxc-config.1*
 %{_mandir}/man1/lxc-console.1*
