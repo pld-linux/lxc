@@ -8,7 +8,7 @@
 %bcond_without	lua		# Lua binding
 %bcond_without	python		# Python binding
 %bcond_with	selinux		# SELinux support
-%bcond_with	cgmanager	# cgmanager support (BR: libcgmanager, libnih >= 1.0.2, libnih-dbus >= 1.0.0, dbus-1 >= 1.2.16)
+%bcond_with	cgmanager	# cgmanager support
 
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
@@ -27,12 +27,15 @@ Patch1:		x32.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
+%{?with_cgmanager:BuildRequires:	cgmanager-devel}
+%{?with_cgmanager:BuildRequires:	dbus-devel >= 1.2.16}
 BuildRequires:	docbook-dtd30-sgml
 BuildRequires:	docbook-utils
 BuildRequires:	docbook2X
 BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
+%{?with_cgmanager:BuildRequires:	libnih-devel >= 1.0.2}
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
 BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua51-devel >= 5.1}
@@ -148,6 +151,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	--enable-doc \
 	--enable-examples \
 	%{__enable_disable apparmor} \
+	%{__enable_disable cgmanager} \
 	%{__enable_disable lua} %{?with_lua:--with-lua-pc=lua51} \
 	%{__enable_disable python} \
 	%{__enable_disable seccomp} \
