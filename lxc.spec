@@ -3,22 +3,22 @@
 # - package apparmor stuff
 
 # Conditional build:
-%bcond_without	seccomp	# SecComp syscall filter
-%bcond_without	apparmor	# apparmor
-%bcond_without	lua	# Lua binding
-%bcond_without	python	# Python binding
-%bcond_with	selinux	# SELinux
-%bcond_with	cgmanager	# Enable cgmanager (BR: libcgmanager, libnih >= 1.0.2, libnih-dbus >= 1.0.0, dbus-1 >= 1.2.16)
+%bcond_without	seccomp		# SecComp syscall filter
+%bcond_without	apparmor	# apparmor support
+%bcond_without	lua		# Lua binding
+%bcond_without	python		# Python binding
+%bcond_with	selinux		# SELinux support
+%bcond_with	cgmanager	# cgmanager support (BR: libcgmanager, libnih >= 1.0.2, libnih-dbus >= 1.0.0, dbus-1 >= 1.2.16)
 
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.1.1
+Version:	1.1.2
 Release:	0.1
 License:	LGPL v2.1+
 Group:		Applications/System
-Source0:	https://www.linuxcontainers.org/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	d80cb08f0edf36f0887e32c96aec8c13
+Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
+# Source0-md5:	3ebadacf5fe8bfe689fd7a09812b682c
 Source1:	%{name}-pld.in.sh
 Source2:	%{name}_macvlan.init
 Source3:	%{name}_macvlan.sysconfig
@@ -37,7 +37,7 @@ BuildRequires:	libcap-devel
 BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua51-devel >= 5.1}
 BuildRequires:	pkgconfig
-%{?with_python:BuildRequires:	python3-devel >= 3.2}
+%{?with_python:BuildRequires:	python3-devel >= 1:3.2}
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
