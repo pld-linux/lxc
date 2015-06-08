@@ -2,7 +2,7 @@
 #
 # lxc_macvlan Start/Stop LXC MACVLAN interface
 #
-# chkconfig: 345 98 02
+# chkconfig: 345 11 89
 # description: Starts/Stops LXC MACVLAN interface.
 #
 ### BEGIN INIT INFO
