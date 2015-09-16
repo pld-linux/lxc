@@ -1,5 +1,8 @@
 # LXC MACVLAN device config 
 
+# Change below to "true" if you want to use macvlan instead of default bridge network
+USE_LXC_MACVLAN="false"
+
 # Logical interface name
 MACVLAN_NAME=macv0
 

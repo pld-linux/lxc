@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# additional macvlan interface for lxc
+
+# TODO: add additional iptables rules / ipv6 / ip_forward
+
+
+macvlan_test_config(){
+
+    # check if all required configurations have been set
+    # Source any configurable options
+    test ! -r /etc/sysconfig/lxc_macvlan ||
+            . /etc/sysconfig/lxc_macvlan
+
+    # Tests for data provided in /etc/sysconfig/lxc_macvlan
+    if [ -z "$MACVLAN_DEV" ]; then
+        echo "MACVLAN_DEV not set is /etc/sysconfig/lxc_macvlan"
+        exit 6
+    fi
+
+    if [ -z "$MACVLAN_NAME" ]; then
+        echo "MACVLAN_NAME not set is /etc/sysconfig/lxc_macvlan"
+        exit 6
+    fi
+
+    if [ -z "$MACVLAN_ADDRESS" ]; then
+        echo "MACVLAN_ADDRESS not set is /etc/sysconfig/lxc_macvlan"
+        exit 6
+    fi
+}
+
+macvlan_gen_default_hwaddr(){
+    # If not defined MACVLAN_HWADDRESS, calculate it from MACVLAN_ADDRESS
+    echo $MACVLAN_ADDRESS | awk -F "/" '{print $1}' | awk -F "." '{ printf "00:16:3e:%x:%x:%x\n", $2, $3, $4 }'
+}
+
+macvlan_start() {
+    echo "LXC macvlan interface start"
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    macvlan_test_config
+
+    set -e
+    if [ -z "$MACVLAN_HWADDRESS" ]; then
+        MACVLAN_HWADDRESS=`macvlan_gen_default_hwaddr`
+    fi
+    ip link add link $MACVLAN_DEV name $MACVLAN_NAME address $MACVLAN_HWADDRESS type macvlan mode bridge
+    ip link set $MACVLAN_NAME up
+    ip address add $MACVLAN_ADDRESS brd + dev $MACVLAN_NAME
+}
+
+macvlan_stop() {
+    echo "LXC macvlan interface stop"
+    macvlan_test_config
+
+    set -e
+    ip link set $MACVLAN_NAME down
+    ip link del $MACVLAN_NAME
+}
+
+macvlan_status() {
+    echo "LXC macvlan interface status"
+    macvlan_test_config
+
+    set -e
+    ip addr show $MACVLAN_NAME
+}
