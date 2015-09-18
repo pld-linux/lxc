@@ -2,9 +2,6 @@
 
 # additional macvlan interface for lxc
 
-# TODO: add additional iptables rules / ipv6 / ip_forward
-
-
 macvlan_test_config(){
 
     # check if all required configurations have been set
@@ -36,7 +33,6 @@ macvlan_gen_default_hwaddr(){
 
 macvlan_start() {
     echo "LXC macvlan interface start"
-    echo 1 > /proc/sys/net/ipv4/ip_forward
     macvlan_test_config
 
     set -e
