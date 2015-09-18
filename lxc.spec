@@ -47,12 +47,15 @@ BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
-Requires:	dnsmasq  # used in lxc-net script
-Requires:       gawk  # lxc_macvlan script
-Requires:	iptables  # used in lxc-net script to set bridge nat
-Requires:	which
+# used in lxc-net script
+Requires:	dnsmasq
+# lxc_macvlan script
+Requires:	gawk
+# used in lxc-net script to set bridge nat
 Requires:	iproute2
+Requires:	iptables
 Requires:	systemd-units >= 38
+Requires:	which
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	/sbin/ldconfig
 Suggests:	gnupg
@@ -206,7 +209,7 @@ install -p %{SOURCE3} $RPM_BUILD_ROOT%{_libdir}/%{name}/lxc_macvlan
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	
+%post
 /sbin/ldconfig
 /sbin/chkconfig --add lxc
 /sbin/chkconfig --add lxc-net
