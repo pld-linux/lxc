@@ -1,5 +1,4 @@
 # TODO
-# - what to do lxc_macvlan.init, when upstream provided lxc-net.init?
 # - package apparmor stuff
 
 # Conditional build:
@@ -13,17 +12,19 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.1.2
-Release:	2
+Version:	1.1.3
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	3ebadacf5fe8bfe689fd7a09812b682c
+# Source0-md5:	197abb5a28ab0b689c737eb1951023fb
 Source1:	%{name}-pld.in.sh
-Source2:	%{name}_macvlan.init
-Source3:	%{name}_macvlan.sysconfig
+# lxc-net based on bridge, macvlan is an alternative/supported lxc network
+Source2:	%{name}_macvlan.sysconfig
+Source3:	%{name}_macvlan
 Patch0:		%{name}-pld.patch
 Patch1:		x32.patch
+Patch2:		%{name}-net.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -41,10 +42,14 @@ BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua51-devel >= 5.1}
 BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python3-devel >= 1:3.2}
+%{?with_python:BuildRequires:	python3-modules}
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
 Requires:	rc-scripts >= 0.4.6
+Requires:	dnsmasq  # used in lxc-net script
+Requires:       gawk  # lxc_macvlan script
+Requires:	iptables  # used in lxc-net script to set bridge nat
 Requires:	which
 Requires:	iproute2
 Requires:	systemd-units >= 38
@@ -72,7 +77,7 @@ applications like bash or sshd.
 
 %description -l pl.UTF-8
 Narzędzia do tworzenia i zarządzania kontenerami. System ten obejmuje
-w pełni funkcjonalne kontenery z ilozacją/wirtualizacją pidów, ipc,
+w pełni funkcjonalne kontenery z izolacją/wirtualizacją pidów, ipc,
 utsname, punktów montowania, /proc, /sys, sieci oraz uwzględniające
 grupy kontrolne. Jest bardzo lekki, elastyczny i udostępnia narzędzia
 do czynności związanych z kontenerami, takich jak monitorowanie z
@@ -136,6 +141,7 @@ bashowe uzupełnianie nazw dla LXC.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 
@@ -185,8 +191,9 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 # yum plugin, no idea where to package this
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/lxc-patch.py
 
-install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/lxc_macvlan
-install -p %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
+install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
+install -p %{SOURCE3} $RPM_BUILD_ROOT%{_libdir}/%{name}/lxc_macvlan
+
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
@@ -203,7 +210,6 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/ldconfig
 /sbin/chkconfig --add lxc
 /sbin/chkconfig --add lxc-net
-/sbin/chkconfig --add lxc_macvlan
 %systemd_post lxc.service lxc-net.service
 
 %preun
@@ -212,8 +218,6 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del lxc
 	%service lxc-net stop
 	/sbin/chkconfig --del lxc-net
-	%service lxc_macvlan stop
-	/sbin/chkconfig --del lxc_macvlan
 fi
 %systemd_preun lxc.service lxc-net.service
 
@@ -250,7 +254,6 @@ fi
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 %attr(754,root,root) /etc/rc.d/init.d/lxc
 %attr(754,root,root) /etc/rc.d/init.d/lxc-net
-%attr(754,root,root) /etc/rc.d/init.d/lxc_macvlan
 
 %{systemdunitdir}/lxc.service
 %{systemdunitdir}/lxc-net.service
@@ -263,13 +266,15 @@ fi
 %attr(755,root,root) %{_libdir}/%{name}/lxc-monitord
 %attr(755,root,root) %{_libdir}/%{name}/lxc-net
 %attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
+%attr(755,root,root) %{_libdir}/%{name}/lxc_macvlan
 %dir %{_sysconfdir}/lxc
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc_macvlan
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
-%attr(755,root,root) %{_datadir}/%{name}/lxc-restore-net
+# below has been removed in lxc-1.1.3
+#%attr(755,root,root) %{_datadir}/%{name}/lxc-restore-net
 %dir %{_datadir}/%{name}/config
 %{_datadir}/%{name}/config/archlinux.*.conf
 %{_datadir}/%{name}/config/centos.*.conf
