@@ -46,7 +46,8 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
-Requires:	rc-scripts >= 0.4.6
+Requires(post):	/sbin/ldconfig
+Requires(post,preun):	/sbin/chkconfig
 # used in lxc-net script
 Requires:	dnsmasq
 # lxc_macvlan script
@@ -54,10 +55,9 @@ Requires:	gawk
 # used in lxc-net script to set bridge nat
 Requires:	iproute2
 Requires:	iptables
+Requires:	rc-scripts >= 0.4.6
 Requires:	systemd-units >= 38
 Requires:	which
-Requires(post,preun):	/sbin/chkconfig
-Requires(post):	/sbin/ldconfig
 Suggests:	gnupg
 Suggests:	gnupg-plugin-keys_curl
 Suggests:	gnupg-plugin-keys_hkp
