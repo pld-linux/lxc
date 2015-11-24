@@ -12,12 +12,12 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.1.3
-Release:	2
+Version:	1.1.5
+Release:	0.1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	197abb5a28ab0b689c737eb1951023fb
+# Source0-md5:	dd9684dde0a58ed13f4f49c855b79a1a
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
@@ -26,13 +26,13 @@ Patch0:		%{name}-pld.patch
 Patch1:		x32.patch
 Patch2:		%{name}-net.patch
 URL:		https://www.linuxcontainers.org/
+# BuildRequires:	docbook-dtd30-sgml
+# BuildRequires:	docbook-utils
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 %{?with_cgmanager:BuildRequires:	cgmanager-devel}
 %{?with_cgmanager:BuildRequires:	dbus-devel >= 1.2.16}
-BuildRequires:	docbook-dtd30-sgml
-BuildRequires:	docbook-utils
-BuildRequires:	docbook2X
+BuildRequires:	docbook2X >= 0.8
 BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
@@ -48,8 +48,6 @@ BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
-# used in lxc-net script
-Requires:	dnsmasq
 # lxc_macvlan script
 Requires:	gawk
 # used in lxc-net script to set bridge nat
@@ -58,6 +56,8 @@ Requires:	iptables
 Requires:	rc-scripts >= 0.4.6
 Requires:	systemd-units >= 38
 Requires:	which
+# used in lxc-net script, but not all cases, may break working setups 
+Suggests:	dnsmasq
 Suggests:	gnupg
 Suggests:	gnupg-plugin-keys_curl
 Suggests:	gnupg-plugin-keys_hkp
@@ -288,6 +288,7 @@ fi
 %{_datadir}/%{name}/config/debian.*.conf
 %{_datadir}/%{name}/config/fedora.*.conf
 %{_datadir}/%{name}/config/gentoo.*.conf
+%{_datadir}/%{name}/config/nesting.conf
 %{_datadir}/%{name}/config/opensuse.*.conf
 %{_datadir}/%{name}/config/openwrt.*.conf
 %{_datadir}/%{name}/config/oracle.*.conf
