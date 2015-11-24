@@ -26,12 +26,11 @@ Patch0:		%{name}-pld.patch
 Patch1:		x32.patch
 Patch2:		%{name}-net.patch
 URL:		https://www.linuxcontainers.org/
-# BuildRequires:	docbook-dtd30-sgml
-# BuildRequires:	docbook-utils
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 %{?with_cgmanager:BuildRequires:	cgmanager-devel}
 %{?with_cgmanager:BuildRequires:	dbus-devel >= 1.2.16}
+BuildRequires:	docbook-dtd45-xml
 BuildRequires:	docbook2X >= 0.8
 BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
