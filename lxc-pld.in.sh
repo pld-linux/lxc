@@ -225,9 +225,12 @@ copy_configuration()
 	mkdir -p $config_path
 	grep -q "^lxc.rootfs" $config_path/config 2>/dev/null || echo "lxc.rootfs = $rootfs_path" >> $config_path/config
 	cat <<EOF >> $config_path/config
+# Most of below settings should be taken as defaults  from
+# lxc.include = /usr/share/lxc/config/common.conf
 lxc.utsname = $utsname
 lxc.tty = 4
 lxc.pts = 1024
+# Consider if below line is right for systemd container
 lxc.mount = $config_path/fstab
 lxc.cap.drop = sys_module mac_admin mac_override sys_time
 

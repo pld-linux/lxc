@@ -1,5 +1,10 @@
 # TODO
 # - package apparmor stuff
+# - update (cut down, include /usr/share/lxc/config/common.conf) default pld container config 
+# NOTE:
+# - does not work properly (dead symlink /proc/self) with PLD kernel 4.1.13 
+#   but seems to work on 4.3.3, vserver issue ?
+#   
 
 # Conditional build:
 %bcond_without	seccomp		# SecComp syscall filter
@@ -13,7 +18,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	1.1.5
-Release:	0.1
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
