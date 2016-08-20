@@ -1,10 +1,10 @@
 # TODO
 # - package apparmor stuff
-# - update (cut down, include /usr/share/lxc/config/common.conf) default pld container config 
+# - update (cut down, include /usr/share/lxc/config/common.conf) default pld container config
 # NOTE:
-# - does not work properly (dead symlink /proc/self) with PLD kernel 4.1.13 
+# - does not work properly (dead symlink /proc/self) with PLD kernel 4.1.13
 #   but seems to work on 4.3.3, vserver issue ?
-#   
+#
 
 # Conditional build:
 %bcond_without	seccomp		# SecComp syscall filter
@@ -18,7 +18,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	2.0.4
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
@@ -51,6 +51,7 @@ BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
+Requires:	%{name}-libs = %{version}-%{release}
 # lxc_macvlan script
 Requires:	gawk
 # used in lxc-net script to set bridge nat
@@ -59,7 +60,7 @@ Requires:	iptables
 Requires:	rc-scripts >= 0.4.6
 Requires:	systemd-units >= 38
 Requires:	which
-# used in lxc-net script, but not all cases, may break working setups 
+# used in lxc-net script, but not all cases, may break working setups
 Suggests:	dnsmasq
 Suggests:	gnupg
 Suggests:	gnupg-plugin-keys_curl
@@ -91,11 +92,19 @@ asynchronicznym powiadamianiem o zdarzeniach czy zamrażanie. Ten
 pakiet jest przydatny do tworzenia wirtualnych serwerów prywatnych
 oraz uruchamiania izolowanych aplikacji, takich jak bash czy sshd.
 
+%package libs
+Summary:	liblxc library
+Group:		Libraries
+Conflicts:	%{name} < 2.0.4-2
+
+%description libs
+liblxc library.
+
 %package devel
 Summary:	Header files for lxc library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki lxc
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
 
 %description devel
 Header files for lxc library.
@@ -212,7 +221,6 @@ install -p %{SOURCE3} $RPM_BUILD_ROOT%{_libdir}/%{name}/lxc_macvlan
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/sbin/ldconfig
 /sbin/chkconfig --add lxc
 /sbin/chkconfig --add lxc-net
 %systemd_post lxc.service lxc-net.service
@@ -227,8 +235,10 @@ fi
 %systemd_preun lxc.service lxc-net.service
 
 %postun
-/sbin/ldconfig
 %systemd_reload
+
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -255,8 +265,6 @@ fi
 %attr(755,root,root) %{_bindir}/lxc-usernsexec
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_sbindir}/init.lxc
-%attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 %attr(754,root,root) /etc/rc.d/init.d/lxc
 %attr(754,root,root) /etc/rc.d/init.d/lxc-net
 
@@ -345,7 +353,6 @@ fi
 %exclude %{_mandir}/ja/man1/lxc-ls.1*
 %exclude %{_mandir}/ja/man1/lxc-top.1*
 
-
 %if %{without python}
 # legacy version
 %attr(755,root,root) %{_bindir}/lxc-ls
@@ -356,6 +363,11 @@ fi
 %dir %{configpath}snap
 %dir %attr(750,root,root) /var/log/lxc
 %dir %attr(750,root,root) /var/cache/lxc
+
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
 
 %files devel
 %defattr(644,root,root,755)
