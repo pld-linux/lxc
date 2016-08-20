@@ -17,19 +17,18 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	1.1.5
+Version:	2.0.4
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	dd9684dde0a58ed13f4f49c855b79a1a
+# Source0-md5:	28db4dbacf860ae742138c0ed8dbf14c
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
 Source3:	%{name}_macvlan
 Patch0:		%{name}-pld.patch
-Patch1:		x32.patch
-Patch2:		%{name}-net.patch
+Patch1:		%{name}-net.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -146,9 +145,8 @@ bashowe uzupełnianie nazw dla LXC.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch0 -p0
 %patch1 -p1
-%patch2 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 
@@ -240,7 +238,7 @@ fi
 %attr(755,root,root) %{_bindir}/lxc-cgroup
 %attr(755,root,root) %{_bindir}/lxc-checkconfig
 %attr(755,root,root) %{_bindir}/lxc-checkpoint
-%attr(755,root,root) %{_bindir}/lxc-clone
+%attr(755,root,root) %{_bindir}/lxc-copy
 %attr(755,root,root) %{_bindir}/lxc-config
 %attr(755,root,root) %{_bindir}/lxc-console
 %attr(755,root,root) %{_bindir}/lxc-create
@@ -269,7 +267,6 @@ fi
 %{_libdir}/%{name}/rootfs/README
 %attr(755,root,root) %{_libdir}/%{name}/lxc-apparmor-load
 %attr(755,root,root) %{_libdir}/%{name}/lxc-containers
-%attr(755,root,root) %{_libdir}/%{name}/lxc-devsetup
 %attr(755,root,root) %{_libdir}/%{name}/lxc-monitord
 %attr(755,root,root) %{_libdir}/%{name}/lxc-net
 %attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
@@ -300,6 +297,7 @@ fi
 %{_datadir}/%{name}/config/ubuntu-cloud.*.conf
 %{_datadir}/%{name}/config/ubuntu.*.conf
 %{_datadir}/%{name}/config/userns.conf
+%dir %{_libdir}/%{name}/hooks
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/selinux
 %{_datadir}/%{name}/selinux/*
@@ -309,12 +307,13 @@ fi
 %attr(755,root,root) %{_datadir}/%{name}/hooks/squid-deb-proxy-client
 %attr(755,root,root) %{_datadir}/%{name}/hooks/ubuntu-cloud-prep
 %attr(755,root,root) %{_datadir}/%{name}/templates/lxc-*
+%attr(755,root,root) %{_libdir}/%{name}/hooks/unmount-namespace
 %{_mandir}/man1/lxc-attach.1*
 %{_mandir}/man1/lxc-autostart.1*
 %{_mandir}/man1/lxc-cgroup.1*
 %{_mandir}/man1/lxc-checkconfig.1*
 %{_mandir}/man1/lxc-checkpoint.1*
-%{_mandir}/man1/lxc-clone.1*
+%{_mandir}/man1/lxc-copy.1*
 %{_mandir}/man1/lxc-config.1*
 %{_mandir}/man1/lxc-console.1*
 %{_mandir}/man1/lxc-create.1*
@@ -344,7 +343,6 @@ fi
 %lang(ja) %{_mandir}/ja/man7/lxc.7*
 %exclude %{_mandir}/ja/man1/lxc-device.1*
 %exclude %{_mandir}/ja/man1/lxc-ls.1*
-%exclude %{_mandir}/ja/man1/lxc-start-ephemeral.1*
 %exclude %{_mandir}/ja/man1/lxc-top.1*
 
 
@@ -381,16 +379,13 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/lxc-device
 %attr(755,root,root) %{_bindir}/lxc-ls
-%attr(755,root,root) %{_bindir}/lxc-start-ephemeral
 %{py3_sitedir}/lxc
 %attr(755,root,root) %{py3_sitedir}/_lxc.cpython-*.so
 %{py3_sitedir}/_lxc-0.1-py*.egg-info
 %{_mandir}/man1/lxc-device.1*
 %{_mandir}/man1/lxc-ls.1*
-%{_mandir}/man1/lxc-start-ephemeral.1*
 %lang(ja) %{_mandir}/ja/man1/lxc-device.1*
 %lang(ja) %{_mandir}/ja/man1/lxc-ls.1*
-%lang(ja) %{_mandir}/ja/man1/lxc-start-ephemeral.1*
 %endif
 
 %files -n bash-completion-%{name}
