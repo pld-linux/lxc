@@ -36,6 +36,7 @@ BuildRequires:	automake
 %{?with_cgmanager:BuildRequires:	dbus-devel >= 1.2.16}
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	docbook2X >= 0.8
+BuildRequires:	doxygen
 BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
@@ -45,7 +46,7 @@ BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua51-devel >= 5.1}
 BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python3-devel >= 1:3.2}
-%{?with_python:BuildRequires:	python3-modules}
+%{?with_python:BuildRequires:	python3-modules >= 1:3.2}
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
@@ -94,11 +95,15 @@ oraz uruchamiania izolowanych aplikacji, takich jak bash czy sshd.
 
 %package libs
 Summary:	liblxc library
+Summary(pl.UTF-8):	Biblioteka liblxc
 Group:		Libraries
-Conflicts:	%{name} < 2.0.4-2
+Conflicts:	lxc < 2.0.4-2
 
 %description libs
 liblxc library.
+
+%description libs -l pl.UTF-8
+Biblioteka liblxc.
 
 %package devel
 Summary:	Header files for lxc library
@@ -130,8 +135,8 @@ Summary:	Python (3.x) binding for LXC
 Summary(pl.UTF-8):	Wiązanie Pythona (3.x) do LXC
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	python3-libs >= 3.2
-Requires:	python3-modules
+Requires:	python3-libs >= 1:3.2
+Requires:	python3-modules >= 1:3.2
 
 %description -n python3-lxc
 Python (3.x) binding for LXC.
@@ -143,7 +148,7 @@ Wiązanie Pythona (3.x) do LXC.
 Summary:	bash-completion for LXC
 Summary(pl.UTF-8):	bashowe uzupełnianie nazw dla LXC
 Group:		Applications/Shells
-Requires:	%{name}
+Requires:	%{name} = %{version}-%{release}
 Requires:	bash-completion
 
 %description -n bash-completion-%{name}
@@ -186,7 +191,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}  \
+install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc} \
         -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,sysconfig}
 
 %{__make} install \
@@ -207,7 +212,6 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
 install -p %{SOURCE3} $RPM_BUILD_ROOT%{_libdir}/%{name}/lxc_macvlan
-
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
@@ -269,6 +273,7 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/lxc-net
 
 %{systemdunitdir}/lxc.service
+%{systemdunitdir}/lxc@.service
 %{systemdunitdir}/lxc-net.service
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/rootfs
@@ -285,8 +290,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lxc/default.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
-# below has been removed in lxc-1.1.3
-#%attr(755,root,root) %{_datadir}/%{name}/lxc-restore-net
 %dir %{_datadir}/%{name}/config
 %{_datadir}/%{name}/config/archlinux.*.conf
 %{_datadir}/%{name}/config/centos.*.conf
@@ -294,6 +297,7 @@ fi
 %dir %{_datadir}/%{name}/config/common.conf.d
 %{_datadir}/%{name}/config/common.conf.d/README
 %{_datadir}/%{name}/config/common.seccomp
+%{_datadir}/%{name}/config/alpine.*.conf
 %{_datadir}/%{name}/config/debian.*.conf
 %{_datadir}/%{name}/config/fedora.*.conf
 %{_datadir}/%{name}/config/gentoo.*.conf
@@ -302,6 +306,8 @@ fi
 %{_datadir}/%{name}/config/openwrt.*.conf
 %{_datadir}/%{name}/config/oracle.*.conf
 %{_datadir}/%{name}/config/plamo.*.conf
+%{_datadir}/%{name}/config/slackware.*.conf
+%{_datadir}/%{name}/config/sparclinux.*.conf
 %{_datadir}/%{name}/config/ubuntu-cloud.*.conf
 %{_datadir}/%{name}/config/ubuntu.*.conf
 %{_datadir}/%{name}/config/userns.conf
@@ -352,11 +358,22 @@ fi
 %exclude %{_mandir}/ja/man1/lxc-device.1*
 %exclude %{_mandir}/ja/man1/lxc-ls.1*
 %exclude %{_mandir}/ja/man1/lxc-top.1*
+%lang(ko) %{_mandir}/ko/man1/lxc*.1*
+%lang(ko) %{_mandir}/ko/man5/lxc-usernet.5*
+%lang(ko) %{_mandir}/ko/man5/lxc.conf.5*
+%lang(ko) %{_mandir}/ko/man5/lxc.container.conf.5*
+%lang(ko) %{_mandir}/ko/man5/lxc.system.conf.5*
+%lang(ko) %{_mandir}/ko/man7/lxc.7*
+%exclude %{_mandir}/ko/man1/lxc-device.1*
+%exclude %{_mandir}/ko/man1/lxc-ls.1*
+%exclude %{_mandir}/ko/man1/lxc-top.1*
 
 %if %{without python}
 # legacy version
 %attr(755,root,root) %{_bindir}/lxc-ls
 %{_mandir}/man1/lxc-ls.1*
+%lang(ja) %{_mandir}/ja/man1/lxc-ls.1*
+%lang(ko) %{_mandir}/ko/man1/lxc-ls.1*
 %endif
 
 %dir %{configpath}
@@ -384,6 +401,7 @@ fi
 %{_datadir}/lua/lxc.lua
 %{_mandir}/man1/lxc-top.1*
 %lang(ja) %{_mandir}/ja/man1/lxc-top.1*
+%lang(ko) %{_mandir}/ko/man1/lxc-top.1*
 %endif
 
 %if %{with python}
@@ -398,6 +416,8 @@ fi
 %{_mandir}/man1/lxc-ls.1*
 %lang(ja) %{_mandir}/ja/man1/lxc-device.1*
 %lang(ja) %{_mandir}/ja/man1/lxc-ls.1*
+%lang(ko) %{_mandir}/ko/man1/lxc-device.1*
+%lang(ko) %{_mandir}/ko/man1/lxc-ls.1*
 %endif
 
 %files -n bash-completion-%{name}
