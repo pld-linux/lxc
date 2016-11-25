@@ -204,6 +204,8 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 %{__make} -C doc install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/liblxc.la
+
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}
 
 # apparmor profiles are not packaged, remove to avoid packagers confusion
@@ -393,7 +395,6 @@ fi
 %attr(755,root,root) %{_libdir}/liblxc.so
 %{_includedir}/lxc
 %{_pkgconfigdir}/lxc.pc
-%{_libdir}/liblxc.la
 
 %if %{with lua}
 %files -n lua-lxc
