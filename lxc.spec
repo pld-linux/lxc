@@ -165,11 +165,13 @@ bashowe uzupełnianie nazw dla LXC.
 cp -p %{SOURCE1} templates/lxc-pld.in
 
 %build
+%{__libtoolize}
 %{__aclocal} -I config
 %{__autoconf}
 %{__autoheader}
 %{__automake}
 %configure \
+	bashcompdir=%{bash_compdir} \
 	db2xman=docbook2X2man \
 	--disable-rpath \
 	--enable-bash \
