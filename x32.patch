@@ -1,0 +1,14 @@
+--- lxc-2.0.8/src/lxc/log.c~	2017-05-11 19:23:06.000000000 +0200
++++ lxc-2.0.8/src/lxc/log.c	2017-05-27 21:36:35.137755023 +0200
+@@ -154,7 +154,11 @@
+ 	seconds = (time->tv_sec - d_in_s - h_in_s - (minutes * 60));
+ 
+ 	/* Make string from nanoseconds. */
++#ifdef __ILP32__
++	ret = snprintf(nanosec, LXC_NUMSTRLEN64, "%lld", time->tv_nsec);
++#else
+ 	ret = snprintf(nanosec, LXC_NUMSTRLEN64, "%ld", time->tv_nsec);
++#endif
+ 	if (ret < 0 || ret >= LXC_NUMSTRLEN64)
+ 		return -1;
+ 
