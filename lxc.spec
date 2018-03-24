@@ -13,17 +13,16 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	2.0.8
-Release:	2
+Version:	2.1.1
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	7bfd95280522d7936c0979dfea92cdb5
+# Source0-md5:	596f7c96ec78e361b057499dbe994703
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
 Source3:	%{name}_macvlan
-Patch0:		%{name}-pld.patch
 Patch1:		%{name}-net.patch
 Patch2:		x32.patch
 URL:		https://www.linuxcontainers.org/
@@ -159,7 +158,6 @@ bashowe uzupełnianie nazw dla LXC.
 
 %prep
 %setup -q
-%patch0 -p0
 %patch1 -p1
 %patch2 -p1
 
@@ -216,7 +214,7 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/%{name}/lxc-patch.py
 
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
-install -p %{SOURCE3} $RPM_BUILD_ROOT%{_libdir}/%{name}/lxc_macvlan
+install -p %{SOURCE3} $RPM_BUILD_ROOT%{_libexecdir}/%{name}/lxc_macvlan
 
 %if %{with python}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
@@ -271,6 +269,7 @@ fi
 %attr(755,root,root) %{_bindir}/lxc-stop
 %attr(755,root,root) %{_bindir}/lxc-unfreeze
 %attr(755,root,root) %{_bindir}/lxc-unshare
+%attr(755,root,root) %{_bindir}/lxc-update-config
 %attr(755,root,root) %{_bindir}/lxc-usernsexec
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_sbindir}/init.lxc
@@ -283,12 +282,12 @@ fi
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/rootfs
 %{_libdir}/%{name}/rootfs/README
-%attr(755,root,root) %{_libdir}/%{name}/lxc-apparmor-load
-%attr(755,root,root) %{_libdir}/%{name}/lxc-containers
-%attr(755,root,root) %{_libdir}/%{name}/lxc-monitord
-%attr(755,root,root) %{_libdir}/%{name}/lxc-net
-%attr(755,root,root) %{_libdir}/%{name}/lxc-user-nic
-%attr(755,root,root) %{_libdir}/%{name}/lxc_macvlan
+%attr(755,root,root) %{_libexecdir}/%{name}/lxc-apparmor-load
+%attr(755,root,root) %{_libexecdir}/%{name}/lxc-containers
+%attr(755,root,root) %{_libexecdir}/%{name}/lxc-monitord
+%attr(755,root,root) %{_libexecdir}/%{name}/lxc-net
+%attr(755,root,root) %{_libexecdir}/%{name}/lxc-user-nic
+%attr(755,root,root) %{_libexecdir}/%{name}/lxc_macvlan
 %dir %{_sysconfdir}/lxc
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc_macvlan
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc
@@ -311,12 +310,16 @@ fi
 %{_datadir}/%{name}/config/openwrt.*.conf
 %{_datadir}/%{name}/config/oracle.*.conf
 %{_datadir}/%{name}/config/plamo.*.conf
+%{_datadir}/%{name}/config/sabayon.common.conf
+%{_datadir}/%{name}/config/sabayon.userns.conf
 %{_datadir}/%{name}/config/slackware.*.conf
 %{_datadir}/%{name}/config/sparclinux.*.conf
 %{_datadir}/%{name}/config/ubuntu-cloud.*.conf
 %{_datadir}/%{name}/config/ubuntu.*.conf
 %{_datadir}/%{name}/config/userns.conf
-%dir %{_libdir}/%{name}/hooks
+%{_datadir}/%{name}/config/voidlinux.common.conf
+%{_datadir}/%{name}/config/voidlinux.userns.conf
+%dir %{_libexecdir}/%{name}/hooks
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/selinux
 %{_datadir}/%{name}/selinux/*
@@ -326,7 +329,7 @@ fi
 %attr(755,root,root) %{_datadir}/%{name}/hooks/squid-deb-proxy-client
 %attr(755,root,root) %{_datadir}/%{name}/hooks/ubuntu-cloud-prep
 %attr(755,root,root) %{_datadir}/%{name}/templates/lxc-*
-%attr(755,root,root) %{_libdir}/%{name}/hooks/unmount-namespace
+%attr(755,root,root) %{_libexecdir}/%{name}/hooks/unmount-namespace
 %{_mandir}/man1/lxc-attach.1*
 %{_mandir}/man1/lxc-autostart.1*
 %{_mandir}/man1/lxc-cgroup.1*
@@ -346,6 +349,7 @@ fi
 %{_mandir}/man1/lxc-stop.1*
 %{_mandir}/man1/lxc-unfreeze.1*
 %{_mandir}/man1/lxc-unshare.1*
+%{_mandir}/man1/lxc-update-config.1*
 %{_mandir}/man1/lxc-user-nic.1*
 %{_mandir}/man1/lxc-usernsexec.1*
 %{_mandir}/man1/lxc-wait.1*
@@ -416,7 +420,7 @@ fi
 %attr(755,root,root) %{_bindir}/lxc-ls
 %{py3_sitedir}/lxc
 %attr(755,root,root) %{py3_sitedir}/_lxc.cpython-*.so
-%{py3_sitedir}/_lxc-0.1-py*.egg-info
+%{py3_sitedir}/lxc-0.1-py*.egg-info
 %{_mandir}/man1/lxc-device.1*
 %{_mandir}/man1/lxc-ls.1*
 %lang(ja) %{_mandir}/ja/man1/lxc-device.1*
