@@ -14,7 +14,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	2.1.1
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
@@ -282,12 +282,15 @@ fi
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/rootfs
 %{_libdir}/%{name}/rootfs/README
+%dir %{_libexecdir}/%{name}
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-apparmor-load
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-containers
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-monitord
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-net
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-user-nic
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc_macvlan
+%dir %{_libexecdir}/%{name}/hooks
+%attr(755,root,root) %{_libexecdir}/%{name}/hooks/unmount-namespace
 %dir %{_sysconfdir}/lxc
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc_macvlan
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/lxc
@@ -319,7 +322,6 @@ fi
 %{_datadir}/%{name}/config/userns.conf
 %{_datadir}/%{name}/config/voidlinux.common.conf
 %{_datadir}/%{name}/config/voidlinux.userns.conf
-%dir %{_libexecdir}/%{name}/hooks
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/selinux
 %{_datadir}/%{name}/selinux/*
@@ -329,7 +331,6 @@ fi
 %attr(755,root,root) %{_datadir}/%{name}/hooks/squid-deb-proxy-client
 %attr(755,root,root) %{_datadir}/%{name}/hooks/ubuntu-cloud-prep
 %attr(755,root,root) %{_datadir}/%{name}/templates/lxc-*
-%attr(755,root,root) %{_libexecdir}/%{name}/hooks/unmount-namespace
 %{_mandir}/man1/lxc-attach.1*
 %{_mandir}/man1/lxc-autostart.1*
 %{_mandir}/man1/lxc-cgroup.1*
