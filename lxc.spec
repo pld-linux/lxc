@@ -5,20 +5,18 @@
 # Conditional build:
 %bcond_without	seccomp		# SecComp syscall filter
 %bcond_without	apparmor	# apparmor support
-%bcond_without	lua		# Lua binding
-%bcond_without	python		# Python binding
 %bcond_with	selinux		# SELinux support
 %bcond_with	cgmanager	# cgmanager support
 
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	2.1.1
-Release:	3
+Version:	3.0.2
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	596f7c96ec78e361b057499dbe994703
+# Source0-md5:	72e2f1e718c7ddf3ffa9b18ec0328d8f
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
@@ -39,11 +37,7 @@ BuildRequires:	libcap-devel
 %{?with_cgmanager:BuildRequires:	libnih-devel >= 1.0.2}
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
 BuildRequires:	libxslt-progs
-%{?with_lua:BuildRequires:	lua51-devel >= 5.1}
 BuildRequires:	pkgconfig
-%{?with_python:BuildRequires:	python3-devel >= 1:3.2}
-%{?with_python:BuildRequires:	python3-modules >= 1:3.2}
-BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
@@ -63,7 +57,6 @@ Suggests:	gnupg
 Suggests:	gnupg-plugin-keys_curl
 Suggests:	gnupg-plugin-keys_hkp
 Suggests:	net-tools
-Suggests:	python3-lxc
 Suggests:	rsync
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -113,33 +106,6 @@ Header files for lxc library.
 %description devel -l pl.UTF-8
 Pliki nagłówkowe biblioteki lxc.
 
-%package -n lua-lxc
-Summary:	Lua binding for LXC
-Summary(pl.UTF-8):	Wiązanie Lua do LXC
-Group:		Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	lua51-libs >= 5.1
-
-%description -n lua-lxc
-Lua binding for LXC.
-
-%description -n lua-lxc -l pl.UTF-8
-Wiązanie Lua do LXC.
-
-%package -n python3-lxc
-Summary:	Python (3.x) binding for LXC
-Summary(pl.UTF-8):	Wiązanie Pythona (3.x) do LXC
-Group:		Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	python3-libs >= 1:3.2
-Requires:	python3-modules >= 1:3.2
-
-%description -n python3-lxc
-Python (3.x) binding for LXC.
-
-%description -n python3-lxc -l pl.UTF-8
-Wiązanie Pythona (3.x) do LXC.
-
 %package -n bash-completion-%{name}
 Summary:	bash-completion for LXC
 Summary(pl.UTF-8):	bashowe uzupełnianie nazw dla LXC
@@ -178,8 +144,6 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	--enable-examples \
 	%{__enable_disable apparmor} \
 	%{__enable_disable cgmanager} \
-	%{__enable_disable lua} %{?with_lua:--with-lua-pc=lua51} \
-	%{__enable_disable python} \
 	%{__enable_disable seccomp} \
 	%{__enable_disable selinux} \
 	--with-config-path=%{configpath} \
@@ -215,14 +179,6 @@ install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc}
 
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/lxc_macvlan
 install -p %{SOURCE3} $RPM_BUILD_ROOT%{_libexecdir}/%{name}/lxc_macvlan
-
-%if %{with python}
-%py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
-%py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}/lxc
-%endif
-%if %{with lua}
-%{__sed} -i -e '1s,#!/usr/bin/env lua,#!/usr/bin/lua5.1,' $RPM_BUILD_ROOT%{_bindir}/lxc-top
-%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -260,19 +216,23 @@ fi
 %attr(755,root,root) %{_bindir}/lxc-console
 %attr(755,root,root) %{_bindir}/lxc-create
 %attr(755,root,root) %{_bindir}/lxc-destroy
+%attr(755,root,root) %{_bindir}/lxc-device
 %attr(755,root,root) %{_bindir}/lxc-execute
 %attr(755,root,root) %{_bindir}/lxc-freeze
 %attr(755,root,root) %{_bindir}/lxc-info
+%attr(755,root,root) %{_bindir}/lxc-ls
 %attr(755,root,root) %{_bindir}/lxc-monitor
 %attr(755,root,root) %{_bindir}/lxc-snapshot
 %attr(755,root,root) %{_bindir}/lxc-start
 %attr(755,root,root) %{_bindir}/lxc-stop
+%attr(755,root,root) %{_bindir}/lxc-top
 %attr(755,root,root) %{_bindir}/lxc-unfreeze
 %attr(755,root,root) %{_bindir}/lxc-unshare
 %attr(755,root,root) %{_bindir}/lxc-update-config
 %attr(755,root,root) %{_bindir}/lxc-usernsexec
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_sbindir}/init.lxc
+%attr(755,root,root) %{_sbindir}/init.lxc.static
 %attr(754,root,root) /etc/rc.d/init.d/lxc
 %attr(754,root,root) /etc/rc.d/init.d/lxc-net
 
@@ -298,36 +258,22 @@ fi
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/lxc.functions
 %dir %{_datadir}/%{name}/config
-%{_datadir}/%{name}/config/archlinux.*.conf
-%{_datadir}/%{name}/config/centos.*.conf
 %{_datadir}/%{name}/config/common.conf
 %dir %{_datadir}/%{name}/config/common.conf.d
 %{_datadir}/%{name}/config/common.conf.d/README
 %{_datadir}/%{name}/config/common.seccomp
-%{_datadir}/%{name}/config/alpine.*.conf
-%{_datadir}/%{name}/config/debian.*.conf
-%{_datadir}/%{name}/config/fedora.*.conf
-%{_datadir}/%{name}/config/gentoo.*.conf
 %{_datadir}/%{name}/config/nesting.conf
-%{_datadir}/%{name}/config/opensuse.*.conf
-%{_datadir}/%{name}/config/openwrt.*.conf
-%{_datadir}/%{name}/config/oracle.*.conf
-%{_datadir}/%{name}/config/plamo.*.conf
-%{_datadir}/%{name}/config/sabayon.common.conf
-%{_datadir}/%{name}/config/sabayon.userns.conf
-%{_datadir}/%{name}/config/slackware.*.conf
-%{_datadir}/%{name}/config/sparclinux.*.conf
-%{_datadir}/%{name}/config/ubuntu-cloud.*.conf
-%{_datadir}/%{name}/config/ubuntu.*.conf
+%{_datadir}/%{name}/config/oci.common.conf
 %{_datadir}/%{name}/config/userns.conf
-%{_datadir}/%{name}/config/voidlinux.common.conf
-%{_datadir}/%{name}/config/voidlinux.userns.conf
 %dir %{_datadir}/%{name}/hooks
 %dir %{_datadir}/%{name}/selinux
 %{_datadir}/%{name}/selinux/*
 %dir %{_datadir}/%{name}/templates
 %attr(755,root,root) %{_datadir}/%{name}/hooks/clonehostname
+%attr(755,root,root) %{_datadir}/%{name}/hooks/dhclient
+%attr(755,root,root) %{_datadir}/%{name}/hooks/dhclient-script
 %attr(755,root,root) %{_datadir}/%{name}/hooks/mount*
+%attr(755,root,root) %{_datadir}/%{name}/hooks/nvidia
 %attr(755,root,root) %{_datadir}/%{name}/hooks/squid-deb-proxy-client
 %attr(755,root,root) %{_datadir}/%{name}/hooks/ubuntu-cloud-prep
 %attr(755,root,root) %{_datadir}/%{name}/templates/lxc-*
@@ -341,13 +287,16 @@ fi
 %{_mandir}/man1/lxc-console.1*
 %{_mandir}/man1/lxc-create.1*
 %{_mandir}/man1/lxc-destroy.1*
+%{_mandir}/man1/lxc-device.1*
 %{_mandir}/man1/lxc-execute.1*
 %{_mandir}/man1/lxc-freeze.1*
 %{_mandir}/man1/lxc-info.1*
+%{_mandir}/man1/lxc-ls.1*
 %{_mandir}/man1/lxc-monitor.1*
 %{_mandir}/man1/lxc-snapshot.1*
 %{_mandir}/man1/lxc-start.1*
 %{_mandir}/man1/lxc-stop.1*
+%{_mandir}/man1/lxc-top.1*
 %{_mandir}/man1/lxc-unfreeze.1*
 %{_mandir}/man1/lxc-unshare.1*
 %{_mandir}/man1/lxc-update-config.1*
@@ -365,26 +314,12 @@ fi
 %lang(ja) %{_mandir}/ja/man5/lxc.container.conf.5*
 %lang(ja) %{_mandir}/ja/man5/lxc.system.conf.5*
 %lang(ja) %{_mandir}/ja/man7/lxc.7*
-%exclude %{_mandir}/ja/man1/lxc-device.1*
-%exclude %{_mandir}/ja/man1/lxc-ls.1*
-%exclude %{_mandir}/ja/man1/lxc-top.1*
 %lang(ko) %{_mandir}/ko/man1/lxc*.1*
 %lang(ko) %{_mandir}/ko/man5/lxc-usernet.5*
 %lang(ko) %{_mandir}/ko/man5/lxc.conf.5*
 %lang(ko) %{_mandir}/ko/man5/lxc.container.conf.5*
 %lang(ko) %{_mandir}/ko/man5/lxc.system.conf.5*
 %lang(ko) %{_mandir}/ko/man7/lxc.7*
-%exclude %{_mandir}/ko/man1/lxc-device.1*
-%exclude %{_mandir}/ko/man1/lxc-ls.1*
-%exclude %{_mandir}/ko/man1/lxc-top.1*
-
-%if %{without python}
-# legacy version
-%attr(755,root,root) %{_bindir}/lxc-ls
-%{_mandir}/man1/lxc-ls.1*
-%lang(ja) %{_mandir}/ja/man1/lxc-ls.1*
-%lang(ko) %{_mandir}/ko/man1/lxc-ls.1*
-%endif
 
 %dir %{configpath}
 %dir %{configpath}snap
@@ -401,34 +336,6 @@ fi
 %attr(755,root,root) %{_libdir}/liblxc.so
 %{_includedir}/lxc
 %{_pkgconfigdir}/lxc.pc
-
-%if %{with lua}
-%files -n lua-lxc
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/lxc-top
-%dir %{_libdir}/lua/lxc
-%attr(755,root,root) %{_libdir}/lua/lxc/core.so
-%{_datadir}/lua/lxc.lua
-%{_mandir}/man1/lxc-top.1*
-%lang(ja) %{_mandir}/ja/man1/lxc-top.1*
-%lang(ko) %{_mandir}/ko/man1/lxc-top.1*
-%endif
-
-%if %{with python}
-%files -n python3-lxc
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/lxc-device
-%attr(755,root,root) %{_bindir}/lxc-ls
-%{py3_sitedir}/lxc
-%attr(755,root,root) %{py3_sitedir}/_lxc.cpython-*.so
-%{py3_sitedir}/lxc-0.1-py*.egg-info
-%{_mandir}/man1/lxc-device.1*
-%{_mandir}/man1/lxc-ls.1*
-%lang(ja) %{_mandir}/ja/man1/lxc-device.1*
-%lang(ja) %{_mandir}/ja/man1/lxc-ls.1*
-%lang(ko) %{_mandir}/ko/man1/lxc-device.1*
-%lang(ko) %{_mandir}/ko/man1/lxc-ls.1*
-%endif
 
 %files -n bash-completion-%{name}
 %defattr(644,root,root,755)
