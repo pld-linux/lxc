@@ -1,15 +1,15 @@
-diff -urN lxc-2.1.1-orig/src/lxc/log.c lxc-2.1.1/src/lxc/log.c
---- lxc-2.1.1-orig/src/lxc/log.c	2017-10-19 19:08:34.000000000 +0200
-+++ lxc-2.1.1/src/lxc/log.c	2018-03-24 13:42:08.659166630 +0100
-@@ -222,7 +222,11 @@
+diff -urN lxc-3.0.3.orig/src/lxc/log.c lxc-3.0.3/src/lxc/log.c
+--- lxc-3.0.3.orig/src/lxc/log.c	2018-11-23 00:08:27.000000000 +0100
++++ lxc-3.0.3/src/lxc/log.c	2019-01-28 19:52:33.204408097 +0100
+@@ -271,7 +271,11 @@
  	seconds = (time->tv_sec - d_in_s - h_in_s - (minutes * 60));
  
  	/* Make string from nanoseconds. */
-+	#ifdef __ILP32__
-+	ret = snprintf(nanosec, LXC_NUMSTRLEN64, "%lld", (int64_t)time->tv_nsec);
-+	#else
- 	ret = snprintf(nanosec, LXC_NUMSTRLEN64, "%"PRId64, (int64_t)time->tv_nsec);
++        #ifdef __ILP32__
++        ret = snprintf(nanosec, LXC_NUMSTRLEN64, "%lld", (int64_t)time->tv_nsec);
++        #else
+ 	ret = snprintf(nanosec, sizeof(nanosec), "%"PRId64, (int64_t)time->tv_nsec);
 +	#endif
- 	if (ret < 0 || ret >= LXC_NUMSTRLEN64)
+ 	if (ret < 0 || ret >= sizeof(nanosec))
  		return -1;
  
