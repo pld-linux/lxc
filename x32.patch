@@ -6,7 +6,7 @@ diff -urN lxc-3.0.3.orig/src/lxc/log.c lxc-3.0.3/src/lxc/log.c
  
  	/* Make string from nanoseconds. */
 +        #ifdef __ILP32__
-+        ret = snprintf(nanosec, LXC_NUMSTRLEN64, "%lld", (int64_t)time->tv_nsec);
++        ret = snprintf(nanosec, sizeof(nanosec), "%lld", (int64_t)time->tv_nsec);
 +        #else
  	ret = snprintf(nanosec, sizeof(nanosec), "%"PRId64, (int64_t)time->tv_nsec);
 +	#endif
