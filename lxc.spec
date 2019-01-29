@@ -3,10 +3,12 @@
 # - update (cut down, include /usr/share/lxc/config/common.conf) default pld container config
 
 # Conditional build:
-%bcond_without	seccomp		# SecComp syscall filter
 %bcond_without	apparmor	# apparmor support
+%bcond_without	seccomp		# SecComp syscall filter
+%bcond_without	static		# static init.lxc variant
 %bcond_with	selinux		# SELinux support
 %bcond_with	cgmanager	# cgmanager support
+%bcond_without	pam		# cgfs PAM module
 
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
@@ -31,12 +33,17 @@ BuildRequires:	automake
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	docbook2X >= 0.8
 BuildRequires:	doxygen
+BuildRequires:	gcc >= 6:4.7
+%{?with_static:BuildRequires:	glibc-static}
 BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
+%{?with_static:BuildRequires:	libcap-static}
 %{?with_cgmanager:BuildRequires:	libnih-devel >= 1.0.2}
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
+BuildRequires:	libtool >= 2:2
 BuildRequires:	libxslt-progs
+%{?with_pam:BuildRequires:	pam-devel}
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.671
 BuildRequires:	sed >= 4.0
@@ -82,6 +89,20 @@ asynchronicznym powiadamianiem o zdarzeniach czy zamrażanie. Ten
 pakiet jest przydatny do tworzenia wirtualnych serwerów prywatnych
 oraz uruchamiania izolowanych aplikacji, takich jak bash czy sshd.
 
+%package -n pam-pam_cgfs
+Summary:	PAM module to create user cgroups
+Summary(pl.UTF-8):	Moduł PAM do tworzenia cgroup użytkownika
+Group:		Libraries
+Requires:	pam
+
+%description -n pam-pam_cgfs
+PAM module that when a user logs in, will create cgroups which the
+user may administer.
+
+%description -n pam-pam_cgfs -l pl.UTF-8
+Moduł PAM, który przy logowaniu użytkownika tworzy cgroupy, którymi
+użytkownik może administrować.
+
 %package libs
 Summary:	liblxc library
 Summary(pl.UTF-8):	Biblioteka liblxc
@@ -105,6 +126,18 @@ Header files for lxc library.
 
 %description devel -l pl.UTF-8
 Pliki nagłówkowe biblioteki lxc.
+
+%package static
+Summary:	Static lxc library
+Summary(pl.UTF-8):	Statyczna biblioteka lxc
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{release}
+
+%description static
+Static lxc library.
+
+%description static -l pl.UTF-8
+Statyczna biblioteka lxc.
 
 %package -n bash-completion-%{name}
 Summary:	bash-completion for LXC
@@ -139,17 +172,18 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	bashcompdir=%{bash_compdir} \
 	db2xman=docbook2X2man \
 	--disable-rpath \
+	%{__enable_disable apparmor} \
 	--enable-bash \
+	%{__enable_disable cgmanager} \
 	--enable-doc \
 	--enable-examples \
-	%{__enable_disable apparmor} \
-	%{__enable_disable cgmanager} \
+	%{?with_pam:--enable-pam} \
 	%{__enable_disable seccomp} \
 	%{__enable_disable selinux} \
 	--with-config-path=%{configpath} \
+	--with-distro=pld \
 	--with-init-script=sysvinit,systemd \
-	--with-runtime-path=/var/run \
-	--with-distro=pld
+	--with-runtime-path=/var/run
 
 %{__make}
 %{__make} -C doc
@@ -232,7 +266,9 @@ fi
 %attr(755,root,root) %{_bindir}/lxc-usernsexec
 %attr(755,root,root) %{_bindir}/lxc-wait
 %attr(755,root,root) %{_sbindir}/init.lxc
+%if %{with static}
 %attr(755,root,root) %{_sbindir}/init.lxc.static
+%endif
 %attr(754,root,root) /etc/rc.d/init.d/lxc
 %attr(754,root,root) /etc/rc.d/init.d/lxc-net
 
@@ -242,7 +278,9 @@ fi
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/rootfs
 %{_libdir}/%{name}/rootfs/README
+%if "%{_libexecdir}" != "%{_libdir}"
 %dir %{_libexecdir}/%{name}
+%endif
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-apparmor-load
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-containers
 %attr(755,root,root) %{_libexecdir}/%{name}/lxc-monitord
@@ -326,6 +364,12 @@ fi
 %dir %attr(750,root,root) /var/log/lxc
 %dir %attr(750,root,root) /var/cache/lxc
 
+%if %{with pam}
+%files -n pam-pam_cgfs
+%defattr(644,root,root,755)
+%attr(755,root,root) /%{_lib}/security/pam_cgfs.so
+%endif
+
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
@@ -334,9 +378,12 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/liblxc.so
-%attr(755,root,root) %{_libdir}/liblxc.a
 %{_includedir}/lxc
 %{_pkgconfigdir}/lxc.pc
+
+%files static
+%defattr(644,root,root,755)
+%{_libdir}/liblxc.a
 
 %files -n bash-completion-%{name}
 %defattr(644,root,root,755)
