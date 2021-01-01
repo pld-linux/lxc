@@ -13,19 +13,18 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	3.2.1
-Release:	2
+Version:	4.0.5
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	4886c8d1c8e221fe526eefcb47857b85
+# Source0-md5:	9db85d0a12b24f674df3e84df12afed9
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
 Source3:	%{name}_macvlan
 Patch1:		%{name}-net.patch
 Patch2:		x32.patch
-Patch3:		%{name}-cgroups.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -160,7 +159,6 @@ bashowe uzupełnianie nazw dla LXC.
 %setup -q
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 
@@ -370,6 +368,8 @@ fi
 %files -n pam-pam_cgfs
 %defattr(644,root,root,755)
 %attr(755,root,root) /%{_lib}/security/pam_cgfs.so
+%{_mandir}/ja/man8/pam_cgfs.8*
+%{_mandir}/man8/pam_cgfs.8*
 %endif
 
 %files libs

@@ -10,6 +10,6 @@ diff -urN lxc-3.0.3.orig/src/lxc/log.c lxc-3.0.3/src/lxc/log.c
 +        #else
  	ret = snprintf(nanosec, sizeof(nanosec), "%"PRId64, (int64_t)time->tv_nsec);
 +	#endif
- 	if (ret < 0 || ret >= sizeof(nanosec))
- 		return -1;
+ 	if (ret < 0 || (size_t)ret >= sizeof(nanosec))
+ 		return ret_errno(EIO);
  
