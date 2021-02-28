@@ -145,9 +145,7 @@ Summary(pl.UTF-8):	bashowe uzupełnianie nazw dla LXC
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
 Requires:	bash-completion
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n bash-completion-%{name}
 bash-completion for LXC.
