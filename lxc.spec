@@ -14,7 +14,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	4.0.8
-Release:	2
+Release:	3
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
@@ -25,6 +25,7 @@ Source2:	%{name}_macvlan.sysconfig
 Source3:	%{name}_macvlan
 Patch1:		%{name}-net.patch
 Patch2:		x32.patch
+Patch3:		no-Werror.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -157,6 +158,7 @@ bashowe uzupełnianie nazw dla LXC.
 %setup -q
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 

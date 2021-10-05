@@ -1,0 +1,20 @@
+--- lxc-4.0.8/configure.ac~	2021-04-30 20:16:25.000000000 +0200
++++ lxc-4.0.8/configure.ac	2021-10-05 23:12:29.650523023 +0200
+@@ -39,7 +39,7 @@
+ AC_CONFIG_SRCDIR([configure.ac])
+ AC_CONFIG_AUX_DIR([config])
+ AC_CONFIG_HEADERS([src/config.h])
+-AM_INIT_AUTOMAKE([-Wall -Werror -Wno-portability subdir-objects])
++AM_INIT_AUTOMAKE([-Wall -Wno-portability subdir-objects])
+ AC_CANONICAL_HOST
+ AM_PROG_CC_C_O
+ AC_USE_SYSTEM_EXTENSIONS
+@@ -838,7 +838,7 @@
+ 
+ CFLAGS="$CFLAGS -Wvla -std=gnu11 -fms-extensions"
+ if test "x$enable_werror" = "xyes"; then
+-	CFLAGS="$CFLAGS -Werror"
++	CFLAGS="$CFLAGS"
+ fi
+ 
+ AC_ARG_ENABLE([thread-safety],
