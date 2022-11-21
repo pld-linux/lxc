@@ -13,12 +13,12 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	4.0.8
-Release:	3
+Version:	4.0.12
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	d70039fe415ff3f9acbb6d1a78a12c52
+# Source0-md5:	4818cb60b1418ca97a8d7c159f9f872b
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
@@ -26,6 +26,7 @@ Source3:	%{name}_macvlan
 Patch1:		%{name}-net.patch
 Patch2:		x32.patch
 Patch3:		no-Werror.patch
+Patch4:		glibc2_36.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -159,6 +160,7 @@ bashowe uzupełnianie nazw dla LXC.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 
@@ -390,3 +392,4 @@ fi
 %files -n bash-completion-%{name}
 %defattr(644,root,root,755)
 %{bash_compdir}/lxc
+%{bash_compdir}/lxc-*
