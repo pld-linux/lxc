@@ -7,7 +7,6 @@
 %bcond_without	seccomp		# SecComp syscall filter
 %bcond_without	static		# static init.lxc variant
 %bcond_with	selinux		# SELinux support
-%bcond_with	cgmanager	# cgmanager support
 %bcond_without	pam		# cgfs PAM module
 
 Summary:	Linux Containers userspace tools
@@ -30,8 +29,6 @@ Patch4:		glibc2_36.patch
 URL:		https://www.linuxcontainers.org/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
-%{?with_cgmanager:BuildRequires:	cgmanager-devel}
-%{?with_cgmanager:BuildRequires:	dbus-devel >= 1.2.16}
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	docbook2X >= 0.8
 BuildRequires:	doxygen
@@ -41,7 +38,6 @@ BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
 %{?with_static:BuildRequires:	libcap-static}
-%{?with_cgmanager:BuildRequires:	libnih-devel >= 1.0.2}
 %{?with_seccomp:BuildRequires:	libseccomp-devel}
 BuildRequires:	libtool >= 2:2
 BuildRequires:	libxslt-progs
@@ -176,7 +172,6 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	--disable-rpath \
 	%{__enable_disable apparmor} \
 	--enable-bash \
-	%{__enable_disable cgmanager} \
 	--enable-doc \
 	--enable-examples \
 	%{?with_pam:--enable-pam} \
