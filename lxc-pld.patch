@@ -1,0 +1,30 @@
+--- lxc-5.0.2/config/init/sysvinit/meson.build.orig	2023-01-16 22:08:50.000000000 +0100
++++ lxc-5.0.2/config/init/sysvinit/meson.build	2023-02-03 21:59:16.701939506 +0100
+@@ -6,12 +6,12 @@ if 'sysvinit' in init_script
+         input: 'lxc-containers.in',
+         output: 'lxc-containers',
+         install: true,
+-        install_dir: join_paths(sysconfdir, 'init.d'))
++        install_dir: join_paths(sysconfdir, 'rc.d', 'init.d'))
+ 
+     configure_file(
+         configuration: conf,
+         input: 'lxc-net.in',
+         output: 'lxc-net',
+         install: true,
+-        install_dir: join_paths(sysconfdir, 'init.d'))
++        install_dir: join_paths(sysconfdir, 'rc.d', 'init.d'))
+ endif
+--- lxc-5.0.2/templates/meson.build.orig	2023-01-16 22:08:50.000000000 +0100
++++ lxc-5.0.2/templates/meson.build	2023-02-03 22:00:05.935006121 +0100
+@@ -27,3 +27,10 @@ template_scripts = configure_file(
+     output: 'lxc-oci',
+     install: true,
+     install_dir: lxctemplatedir)
++
++template_scripts = configure_file(
++    configuration: conf,
++    input: 'lxc-pld.in',
++    output: 'lxc-pld',
++    install: true,
++    install_dir: lxctemplatedir)

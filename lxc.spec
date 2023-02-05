@@ -7,28 +7,26 @@
 %bcond_without	seccomp		# SecComp syscall filter
 %bcond_without	static		# static init.lxc variant
 %bcond_with	selinux		# SELinux support
+%bcond_with	uring		# io-uring based event loop
 %bcond_without	pam		# cgfs PAM module
 
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	4.0.12
+Version:	5.0.2
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	4818cb60b1418ca97a8d7c159f9f872b
+# Source0-md5:	e4e4aada334fb282f9af9b3bd2aa3ad7
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
 Source3:	%{name}_macvlan
+Patch0:		%{name}-pld.patch
 Patch1:		%{name}-net.patch
 Patch2:		x32.patch
-Patch3:		no-Werror.patch
-Patch4:		glibc2_36.patch
 URL:		https://www.linuxcontainers.org/
-BuildRequires:	autoconf >= 2.50
-BuildRequires:	automake
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	docbook2X >= 0.8
 BuildRequires:	doxygen
@@ -38,12 +36,14 @@ BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
 %{?with_static:BuildRequires:	libcap-static}
-%{?with_seccomp:BuildRequires:	libseccomp-devel}
-BuildRequires:	libtool >= 2:2
+%{?with_seccomp:BuildRequires:	libseccomp-devel >= 2.5.0}
+%{?with_uring:BuildRequires:	liburing-devel}
 BuildRequires:	libxslt-progs
+BuildRequires:	meson >= 0.61
+BuildRequires:	ninja >= 1.5
 %{?with_pam:BuildRequires:	pam-devel}
 BuildRequires:	pkgconfig
-BuildRequires:	rpmbuild(macros) >= 1.671
+BuildRequires:	rpmbuild(macros) >= 1.736
 BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
@@ -105,6 +105,7 @@ użytkownik może administrować.
 Summary:	liblxc library
 Summary(pl.UTF-8):	Biblioteka liblxc
 Group:		Libraries
+%{?with_seccomp:Requires:	libseccomp >= 2.5.0}
 Conflicts:	lxc < 2.0.4-2
 
 %description libs
@@ -153,52 +154,37 @@ bashowe uzupełnianie nazw dla LXC.
 
 %prep
 %setup -q
+%patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
 
 cp -p %{SOURCE1} templates/lxc-pld.in
 
-%build
-%{__libtoolize}
-%{__aclocal} -I config
-%{__autoconf}
-%{__autoheader}
-%{__automake}
-%configure \
-	bashcompdir=%{bash_compdir} \
-	db2xman=docbook2X2man \
-	--disable-rpath \
-	%{__enable_disable apparmor} \
-	--enable-bash \
-	--enable-doc \
-	--enable-examples \
-	%{?with_pam:--enable-pam} \
-	%{__enable_disable seccomp} \
-	%{__enable_disable selinux} \
-	--with-config-path=%{configpath} \
-	--with-distro=pld \
-	--with-init-script=sysvinit,systemd \
-	--with-runtime-path=/var/run
+%{__sed} -i -e "/^pam_security =/ s!libdir,!'/', '%{_lib}',!" meson.build
 
-%{__make}
-%{__make} -C doc
+%build
+%meson build \
+	%{!?with_apparmor:-Dapparmor=false} \
+	-Ddata-path=%{configpath} \
+	-Ddistrosysconfdir=/etc/sysconfig \
+	-Dinit-script=sysvinit,systemd \
+	%{?with_uring:-Dio-uring-event-loop} \
+	%{?with_pam:-Dpam-cgroup=true} \
+	-Druntime-path=/var/run \
+	%{!?with_seccomp:-Dseccomp=false} \
+	%{!?with_selinux:-Dselinux=false} \
+	-Dsystemd-unitdir=%{systemdunitdir}
+
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/{cache,log}/lxc} \
-        -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,sysconfig}
+install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/log/lxc}
 
-%{__make} install \
-	SYSTEMD_UNIT_DIR=%{systemdunitdir} \
-	pcdatadir=%{_pkgconfigdir} \
-	DESTDIR=$RPM_BUILD_ROOT
+%ninja_install -C build
 
-%{__make} -C doc install \
-	DESTDIR=$RPM_BUILD_ROOT
-
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/liblxc.la
+# keep compatible name
+%{__mv} $RPM_BUILD_ROOT/etc/rc.d/init.d/{lxc-containers,lxc}
 
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}
 
@@ -236,7 +222,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS CONTRIBUTING MAINTAINERS README  doc/FAQ.txt doc/examples/*.conf
+%doc AUTHORS COPYING MAINTAINERS README.md  doc/FAQ.txt build/doc/examples/*.conf
 %attr(755,root,root) %{_bindir}/lxc-attach
 %attr(755,root,root) %{_bindir}/lxc-autostart
 %attr(755,root,root) %{_bindir}/lxc-cgroup
@@ -271,6 +257,7 @@ fi
 
 %{systemdunitdir}/lxc.service
 %{systemdunitdir}/lxc@.service
+%{systemdunitdir}/lxc-monitord.service
 %{systemdunitdir}/lxc-net.service
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/rootfs
@@ -301,8 +288,11 @@ fi
 %{_datadir}/%{name}/config/oci.common.conf
 %{_datadir}/%{name}/config/userns.conf
 %dir %{_datadir}/%{name}/hooks
+%if %{with selinux}
 %dir %{_datadir}/%{name}/selinux
-%{_datadir}/%{name}/selinux/*
+%{_datadir}/%{name}/selinux/lxc.if
+%{_datadir}/%{name}/selinux/lxc.te
+%endif
 %dir %{_datadir}/%{name}/templates
 %attr(755,root,root) %{_datadir}/%{name}/hooks/clonehostname
 %attr(755,root,root) %{_datadir}/%{name}/hooks/dhclient
@@ -386,5 +376,5 @@ fi
 
 %files -n bash-completion-%{name}
 %defattr(644,root,root,755)
-%{bash_compdir}/lxc
+%{bash_compdir}/_lxc
 %{bash_compdir}/lxc-*
