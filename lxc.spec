@@ -163,7 +163,7 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 %{__sed} -i -e "/^pam_security =/ s!libdir,!'/', '%{_lib}',!" meson.build
 
 %build
-%meson build \
+%meson \
 	%{!?with_apparmor:-Dapparmor=false} \
 	-Ddata-path=%{configpath} \
 	-Ddistrosysconfdir=/etc/sysconfig \
@@ -175,13 +175,13 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	%{!?with_selinux:-Dselinux=false} \
 	-Dsystemd-unitdir=%{systemdunitdir}
 
-%ninja_build -C build
+%meson_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{configpath},%{configpath}snap,/var/log/lxc}
 
-%ninja_install -C build
+%meson_install
 
 # keep compatible name
 %{__mv} $RPM_BUILD_ROOT/etc/rc.d/init.d/{lxc-containers,lxc}
