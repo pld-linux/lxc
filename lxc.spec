@@ -13,12 +13,12 @@
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	6.0.1
+Version:	6.0.5
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	b2f97a0fdd2bd6dc7515bb103f8eb7ad
+# Source0-md5:	b62b28e21b7c06920db313c4df5a80c0
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
@@ -27,6 +27,7 @@ Patch0:		%{name}-pld.patch
 Patch1:		%{name}-net.patch
 Patch2:		x32.patch
 URL:		https://www.linuxcontainers.org/
+BuildRequires:	dbus-devel
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	docbook2X >= 0.8
 BuildRequires:	doxygen
@@ -37,12 +38,15 @@ BuildRequires:	gnutls-devel
 BuildRequires:	libcap-devel
 %{?with_static:BuildRequires:	libcap-static}
 %{?with_seccomp:BuildRequires:	libseccomp-devel >= 2.5.0}
+%{?with_selinux:BuildRequires:	libselinux-devel}
 %{?with_uring:BuildRequires:	liburing-devel}
 BuildRequires:	libxslt-progs
 BuildRequires:	meson >= 0.61
 BuildRequires:	ninja >= 1.5
+BuildRequires:	openssl-devel
 %{?with_pam:BuildRequires:	pam-devel}
 BuildRequires:	pkgconfig
+BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
@@ -119,6 +123,13 @@ Summary:	Header files for lxc library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki lxc
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	dbus-devel
+Requires:	libcap-devel
+%{?with_seccomp:Requires:	libseccomp-devel >= 2.5.0}
+%{?with_selinux:Requires:	libselinux-devel}
+%{?with_uring:Requires:	liburing-devel}
+Requires:	openssl-devel
+%{?with_pam:Requires:	pam-devel}
 
 %description devel
 Header files for lxc library.
@@ -143,7 +154,7 @@ Summary:	bash-completion for LXC
 Summary(pl.UTF-8):	bashowe uzupełnianie nazw dla LXC
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
-Requires:	bash-completion
+Requires:	bash-completion >= 1:2.0
 BuildArch:	noarch
 
 %description -n bash-completion-%{name}
