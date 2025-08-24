@@ -43,7 +43,7 @@ BuildRequires:	meson >= 0.61
 BuildRequires:	ninja >= 1.5
 %{?with_pam:BuildRequires:	pam-devel}
 BuildRequires:	pkgconfig
-BuildRequires:	rpmbuild(macros) >= 1.736
+BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
