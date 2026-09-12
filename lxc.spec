@@ -3,22 +3,24 @@
 # - update (cut down, include /usr/share/lxc/config/common.conf) default pld container config
 
 # Conditional build:
+%bcond_without	apidocs		# API documentation
 %bcond_without	apparmor	# apparmor support
 %bcond_without	seccomp		# SecComp syscall filter
 %bcond_without	static		# static init.lxc variant
 %bcond_with	selinux		# SELinux support
+%bcond_with	landlock	# no Landlock restriction of the monitor process
 %bcond_with	uring		# io-uring based event loop
 %bcond_without	pam		# cgfs PAM module
 
 Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
-Version:	6.0.5
+Version:	7.0.0
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
-# Source0-md5:	b62b28e21b7c06920db313c4df5a80c0
+# Source0-md5:	7c898653d6716cba0e0fc330f57e78ca
 Source1:	%{name}-pld.in.sh
 # lxc-net based on bridge, macvlan is an alternative/supported lxc network
 Source2:	%{name}_macvlan.sysconfig
@@ -30,10 +32,9 @@ URL:		https://www.linuxcontainers.org/
 BuildRequires:	dbus-devel
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	docbook2X >= 0.8
-BuildRequires:	doxygen
+%{?with_apidocs:BuildRequires:	doxygen}
 BuildRequires:	gcc >= 6:4.7
 %{?with_static:BuildRequires:	glibc-static}
-BuildRequires:	gnutls-devel
 %{?with_apparmor:BuildRequires:	libapparmor-devel}
 BuildRequires:	libcap-devel
 %{?with_static:BuildRequires:	libcap-static}
@@ -149,6 +150,18 @@ Static lxc library.
 %description static -l pl.UTF-8
 Statyczna biblioteka lxc.
 
+%package apidocs
+Summary:	liblxc API documentation
+Summary(pl.UTF-8):	Dokumentacja API biblioteki liblxc
+Group:		Documentation
+BuildArch:	noarch
+
+%description apidocs
+liblxc API documentation.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API biblioteki liblxc.
+
 %package -n bash-completion-%{name}
 Summary:	bash-completion for LXC
 Summary(pl.UTF-8):	bashowe uzupełnianie nazw dla LXC
@@ -179,7 +192,8 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	-Ddata-path=%{configpath} \
 	-Ddistrosysconfdir=/etc/sysconfig \
 	-Dinit-script=sysvinit,systemd \
-	%{?with_uring:-Dio-uring-event-loop} \
+	%{?with_uring:-Dio-uring-event-loop=true} \
+	-Dlandlock-monitor=%{__true_false landlock} \
 	%{?with_pam:-Dpam-cgroup=true} \
 	-Druntime-path=/var/run \
 	%{!?with_seccomp:-Dseccomp=false} \
@@ -187,6 +201,14 @@ cp -p %{SOURCE1} templates/lxc-pld.in
 	-Dsystemd-unitdir=%{systemdunitdir}
 
 %meson_build
+
+%if %{with apidocs}
+# meson's api-docs target runs doxygen from the build dir, where the
+# Doxyfile's relative INPUT paths resolve to nothing
+cd doc/api
+doxygen
+cd ../..
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -384,6 +406,12 @@ fi
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/liblxc.a
+
+%if %{with apidocs}
+%files apidocs
+%defattr(644,root,root,755)
+%doc doc/api/html/*
+%endif
 
 %files -n bash-completion-%{name}
 %defattr(644,root,root,755)
