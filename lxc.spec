@@ -16,7 +16,7 @@ Summary:	Linux Containers userspace tools
 Summary(pl.UTF-8):	Narzędzia do kontenerów linuksowych (LXC)
 Name:		lxc
 Version:	7.0.0
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://linuxcontainers.org/downloads/lxc/%{name}-%{version}.tar.gz
@@ -292,9 +292,6 @@ fi
 %{systemdunitdir}/lxc@.service
 %{systemdunitdir}/lxc-monitord.service
 %{systemdunitdir}/lxc-net.service
-%dir %{_libdir}/%{name}
-%dir %{_libdir}/%{name}/rootfs
-%{_libdir}/%{name}/rootfs/README
 %if "%{_libexecdir}" != "%{_libdir}"
 %dir %{_libexecdir}/%{name}
 %endif
@@ -396,6 +393,10 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/liblxc.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblxc.so.1
+# liblxc pivots every container rootfs through this directory
+%dir %{_libdir}/%{name}
+%dir %{_libdir}/%{name}/rootfs
+%{_libdir}/%{name}/rootfs/README
 
 %files devel
 %defattr(644,root,root,755)
